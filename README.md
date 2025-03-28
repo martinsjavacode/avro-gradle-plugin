@@ -29,10 +29,12 @@ Add the plugin to your `build.gradle.kts` file:
 
 ```kotlin
 plugins {
-    id("io.github.martinsjavacode.avro") version "1.0.0"
+    id("io.github.martinsjavacode.avro-gradle-plugin") version "1.0.0"
 }
 
 avro {
+    group = "build"
+    description = "Plugin to generate Avro classes from schema files in the project"
     sourceDir = "src/main/avro"
     outputDir = "build/generated-sources/avro"
     fieldVisibility = "PRIVATE"

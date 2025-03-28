@@ -11,18 +11,6 @@ plugins {
 group = "io.github.martinsjavacode"
 version = "1.0.0"
 
-gradlePlugin {
-    plugins {
-        create("avroPlugin") {
-            id = "io.github.martinsjavacode.avro-gradle-plugin"
-            implementationClass = "io.github.martinsjavacode.AvroGradlePlugin"
-            displayName = "Avro Plugin for Gradle"
-            description = "A Gradle plugin to allow easily performing Java code generation for Apache Avro."
-            tags.set(listOf("avro", "generator", "gradle", "serialization", "java", "avsc"))
-        }
-    }
-}
-
 repositories {
     mavenCentral()
 }
@@ -42,23 +30,49 @@ tasks.test {
     useJUnitPlatform()
 }
 
-// publishing {
-//    publications {
-//        create<MavenPublication>("maven") {
-//            from(components["java"])
-//            groupId = project.group.toString()
-//            artifactId = project.name
-//            version = project.version.toString()
-//        }
-//    }
-//    repositories {
-//        maven {
-//            name = "GradlePluginPortal"
-//            url = uri("https://plugins.gradle.org/m2/")
-//            credentials {
-//                username = findProperty("plugin.portal.username") ?: System.getenv("GRADLE_PLUGIN_PORTAL_USERNAME")
-//                password = findProperty("plugin.portal.password") ?: System.getenv("GRADLE_PLUGIN_PORTAL_PASSWORD")
-//            }
-//        }
-//    }
-// }
+gradlePlugin {
+    plugins {
+        create("avro") {
+            id = "io.github.martinsjavacode.avro-gradle-plugin"
+            implementationClass = "io.github.martinsjavacode.avro.AvroGradlePlugin"
+            displayName = "Avro Gradle Plugin"
+            description = "A Gradle plugin to allow easily performing Java code generation for Apache Avro."
+            tags.set(listOf("avro", "generator", "gradle", "serialization", "java", "avsc"))
+        }
+    }
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            from(components["java"])
+            group = project.group
+            version = project.version.toString()
+            artifactId = project.name
+        }
+    }
+    repositories {
+        maven {
+            name = "GradlePluginPortal"
+            url = uri("https://plugins.gradle.org/m2/")
+            credentials {
+                username = findProperty("plugin.portal.username")?.toString()
+                    ?: System.getenv("GRADLE_PLUGIN_PORTAL_USERNAME")
+                password =
+                    findProperty("plugin.portal.password")?.toString()
+                        ?: System.getenv("GRADLE_PLUGIN_PORTAL_PASSWORD")
+            }
+        }
+
+        maven {
+            name = "NexusLocal"
+            url = uri("http://localhost:8000/repository/maven-snapshots")
+            isAllowInsecureProtocol = true
+            credentials {
+                username = "admin"
+                password = "123124"
+            }
+            version = "1.0.0-SNAPSHOT"
+        }
+    }
+}

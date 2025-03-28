@@ -1,4 +1,4 @@
-package io.github.martinsjavacode
+package io.github.martinsjavacode.avro
 
 import org.apache.avro.Schema
 import org.apache.avro.compiler.specific.SpecificCompiler
@@ -6,6 +6,7 @@ import org.apache.avro.compiler.specific.SpecificCompiler.FieldVisibility
 import org.apache.avro.generic.GenericData.StringType
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import java.io.File
 import java.util.*
 
 class AvroGradlePlugin : Plugin<Project> {
@@ -58,25 +59,40 @@ class AvroGradlePlugin : Plugin<Project> {
                     return@doLast
                 }
 
-                finalSourceDir.listFiles { file ->
-                    file.extension == "avsc"
-                }?.forEach { avscFile ->
-                    // Parse avsc file to avro schema
-                    val schema = Schema.Parser().parse(avscFile)
-                    val compiler =
-                        SpecificCompiler(schema).apply {
-                            isCreateOptionalGetters = extension.optionalGetters
-                            isCreateSetters = extension.fieldVisibility == "PUBLIC"
-                            setFieldVisibility(FieldVisibility.valueOf(extension.fieldVisibility))
-                            setStringType(StringType.valueOf(extension.stringType))
-                        }
-
-                    val output = compiler.compileToDestination(avscFile, outputDirectory)
-                    project.logger.lifecycle("Generated class: $output")
-                }
+                finalSourceDir.listFiles {
+                    file -> file.isDirectory
+                }?.forEach { subDir ->
+                    val finalSubDir = File(finalSourceDir, subDir.name)
+                    if (finalSubDir.exists()) {
+                        project.logger.lifecycle("Using sub source directory: $finalSubDir")
+                        generate(project, extension, finalSubDir, outputDirectory)
+                    } else {
+                        project.logger.lifecycle("Sub source directory does not exist: $finalSubDir")
+                        return@doLast
+                    }
+                } ?: generate(project, extension, finalSourceDir, outputDirectory)
 
                 project.logger.lifecycle("Avro classes generated successfully")
             }
+        }
+    }
+
+    private fun generate(project: Project, extension: AvroPluginExtension, sourceDirectory: File, outputDirectory: File,) {
+        sourceDirectory.listFiles { file ->
+            file.extension == "avsc"
+        }?.forEach { avscFile ->
+            // Parse avsc file to avro schema
+            val schema = Schema.Parser().parse(avscFile)
+            val compiler =
+                SpecificCompiler(schema).apply {
+                    isCreateOptionalGetters = extension.optionalGetters
+                    isCreateSetters = extension.fieldVisibility == "PUBLIC"
+                    setFieldVisibility(FieldVisibility.valueOf(extension.fieldVisibility))
+                    setStringType(StringType.valueOf(extension.stringType))
+                }
+
+            val output = compiler.compileToDestination(avscFile, outputDirectory)
+            project.logger.lifecycle("Generated class: $output")
         }
     }
 }
