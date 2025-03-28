@@ -47,8 +47,8 @@ publishing {
         create<MavenPublication>("maven") {
             from(components["java"])
             group = project.group
-            version = project.version.toString()
             artifactId = project.name
+            version = project.version.toString()
         }
     }
     repositories {
@@ -66,13 +66,17 @@ publishing {
 
         maven {
             name = "NexusLocal"
+            description = "Repository for local development"
             url = uri("http://localhost:8000/repository/maven-snapshots")
             isAllowInsecureProtocol = true
             credentials {
-                username = "admin"
-                password = "123124"
+                username = findProperty("nexus.username")?.toString()
+                    ?: System.getenv("NEXUS_USERNAME")
+                password =
+                    findProperty("nexus.password")?.toString()
+                        ?: System.getenv("NEXUS_PASSWORD")
             }
-            version = "1.0.0-SNAPSHOT"
+            version = "$version-SNAPSHOT"
         }
     }
 }
