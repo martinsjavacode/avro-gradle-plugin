@@ -1,0 +1,12 @@
+{
+    "type": "record",
+    "connect.name": "io.github.amartins.sample.User",
+    "namespace": "io.github.amartins",
+    "name": "User",
+    "fields": [
+        {"name": "id", "type": "string"},
+        {"name": "name", "type": "string"},
+        {"name": "email", "type": "string"},
+        {"name": "age", "type": ["null", "int"], "default": null}
+    ]
+}
