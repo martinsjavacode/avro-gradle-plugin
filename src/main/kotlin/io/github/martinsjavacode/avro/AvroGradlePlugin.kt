@@ -27,9 +27,9 @@ class AvroGradlePlugin : Plugin<Project> {
                     extension.outputDir?.let { project.file(it) }
                         ?: project.file("build/generated/java")
 
-                if (!outputDirectory.exists()) {
-                    outputDirectory.mkdirs()
-                }
+                // Ensure the output directory exists
+                outputDirectory.deleteRecursively()
+                outputDirectory.mkdirs()
 
                 val propertyFile = project.file("application.properties")
                 val yamlFile = project.file("application.yml")
