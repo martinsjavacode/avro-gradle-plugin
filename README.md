@@ -4,6 +4,18 @@ The **Avro Gradle Plugin** simplifies the process of generating Java classes fro
 
 ---
 
+## **Table of Contents**
+- [Features](#features)
+- [Requirements](#requirements)
+- [Configuration Options](#configuration-options)
+- [Usage Example](#usage-example)
+- [Contributing](#contributing)
+- [Authors](#authors)
+- [Issues](#issues)
+- [License](#license)
+
+---
+
 ## **Features**
 - **Automatic Java Class Generation**: Generate Java classes directly from Avro schema files.
 - **Customizable Directories**: Specify source and output directories for Avro schema files and generated classes.
@@ -69,6 +81,8 @@ Or build the project to include Avro generation:
   ./gradlew build
 ```
 
+---
+
 ## **Contributing**
 Contributions are welcome! To contribute:
 1.  Fork the repository.
@@ -86,8 +100,19 @@ Contributions are welcome! To contribute:
     ```
 5. Open a Pull Request on GitHub.
 
+---
+
+## Authors
+- **Martins**
+  [GitHub](https://github.com/martinsjavacode)
+  Email: amartins.alexandre@hotmail.com
+
+---
+
 ## **Issues**
 If you encounter any issues or have feature requests, please open an issue in the [GitHub repository](https://github.com/martinsjavacode/avro-gradle-plugin/issues).
+
+---
 
 ## **License**
 This project is licensed under the Apache License 2.0. See the [LICENSE](LICENSE) file for full details.
