@@ -1,0 +1,124 @@
+name: Release Gradle Plugin
+
+on:
+  workflow_dispatch:
+    inputs:
+      publishOnly:
+        description: 'Only Publish the plugin to the Gradle Plugin Portal'
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: corretto
+          java-version: 21
+
+      - name: Gradle Wrapper Validation
+        uses: gradle/actions/wrapper-validation@v4
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Build with Gradle
+        run: ./gradlew test
+
+  determine-version:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.semantic_version.outputs.version }}
+      previous_version: ${{ steps.semantic_version.outputs.previous_version }}
+      version_type: ${{ steps.semantic_version.outputs.version_type }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Semantic Versioning
+        id: semantic_version
+        uses: paulhatch/semantic-version@v5.4.0
+
+  release:
+    runs-on: ubuntu-latest
+    needs: [ test, determine-version ]
+    if: inputs.publishOnly == false && needs.determine-version.outputs.version_type != 'none'
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Create new tagged release
+        run: |
+          # Set up Git user
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "8130295+github-actions[bot]@users.noreply.github.com"
+
+          # Update version in build.gradle.kts
+          sed -i 's/version = ".*"/version = "${{ needs.determine-version.outputs.version }}"/' build.gradle.kts
+          git add build.gradle.kts
+          git commit -m "chore: bump version to ${{ needs.determine-version.outputs.version }}"
+          git push origin main
+
+          # Create a new tag
+          git tag v${{ needs.determine-version.outputs.version }}
+          git push origin v${{ needs.determine-version.outputs.version }}
+
+      - name: Update CHANGELOG
+        id: changelog
+        uses: requarks/changelog-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fromTag: v${{ needs.determine-version.outputs.version }}
+          toTag: v${{ needs.determine-version.outputs.previous_version }}
+          writeToFile: false
+
+      - name: Generate GitHub Release Notes
+        uses: ncipollo/release-action@v1
+        with:
+          generateReleaseNotes: true
+          tag: v${{ needs.determine-version.outputs.version }}
+          body: ${{ steps.changelog.outputs.changes }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  publish:
+    runs-on: ubuntu-latest
+    needs: [ release, determine-version ]
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: v${{ needs.determine-version.outputs.version }}
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Gradle Wrapper Validation
+        uses: gradle/actions/wrapper-validation@v4
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Publish Plugin to Gradle Plugin Portal
+        run: ./gradlew publishPlugins
+        env:
+          GRADLE_PUBLISH_KEY: ${{ secrets.GRADLE_PUBLISH_KEY }}
+          GRADLE_PUBLISH_SECRET: ${{ secrets.GRADLE_PUBLISH_SECRET }}
