@@ -19,14 +19,15 @@ The **Avro Gradle Plugin** simplifies the process of generating Java classes fro
 ## **Features**
 - **Automatic Java Class Generation**: Generate Java classes directly from Avro schema files.
 - **Customizable Directories**: Specify source and output directories for Avro schema files and generated classes.
-- **Field Visibility Control**: Configure fields as `public` or `private`.
+- **Field Visibility Control**: Configure fields as `PUBLIC` or `PRIVATE`.
 - **String Type Selection**: Choose between `String`, `CharSequence`, or `Utf8` for string representations.
 - **Optional Getters**: Enable or disable optional getter methods in the generated classes.
+- **Null-Safe Annotations**: Optionally add null-safe annotations to generated classes.
+- **Decimal Logical Type Support**: Enable support for decimal logical types in Avro schemas.
 - **Gradle Integration**: Fully integrates with both Kotlin DSL and Groovy DSL.
 - **Multiple Schema File Support**: Process multiple Avro schema files effortlessly.
 - **Automatic Task Creation**: Automatically adds a `generateAvroClasses` task to your Gradle workflow.
 - **Simple Configuration**: Intuitive configuration options for quick setup.
-
 ---
 
 ## **Requirements**
@@ -36,18 +37,20 @@ The **Avro Gradle Plugin** simplifies the process of generating Java classes fro
 
 ---
 
-## **Configuration Options**
+**Configuration Options**
 Define configuration options in the `avro` block within your project's `build.gradle` or `build.gradle.kts` file. The following options are supported:
 
-| **Option**            | **Description**                                                                     | **Default Value**            | **Allowed Values**           |
-|-----------------------|-------------------------------------------------------------------------------------|-----------------------------|-----------------------------|
-| `sourceDir`           | Directory containing Avro schema files (`*.avsc`).                                  | `src/main/resources/avro`   | Custom directory path       |
-| `outputDir`           | Directory to save generated Java classes.                                           | `build/generated/java`      | Custom directory path       |
-| `group`               | Gradle task group.                                                                  | `build`                     | Any string value            |
-| `description`         | Description of the Gradle task.                                                     | _Plugin description_        | Any string value            |
-| `fieldVisibility`     | Visibility of generated fields.                                                     | `PUBLIC`                    | `PUBLIC`, `PRIVATE`         |
-| `stringType`          | String representation to use in generated classes.                                  | `String`                    | `String`, `CharSequence`, `Utf8` |
-| `optionalGetters`     | Enables optional getter methods for generated fields.                               | `false`                     | `true`, `false`             |
+| **Option**                | **Description**                                                                     | **Default Value**            | **Allowed Values**           |
+|---------------------------|-------------------------------------------------------------------------------------|-----------------------------|-----------------------------|
+| `sourceDir`               | Directory containing Avro schema files (`*.avsc`).                                  | `src/main/resources/avro`   | Custom directory path       |
+| `outputDir`               | Directory to save generated Java classes.                                           | `build/generated/java`      | Custom directory path       |
+| `group`                   | Gradle task group.                                                                  | `build`                     | Any string value            |
+| `description`             | Description of the Gradle task.                                                     | _Plugin description_        | Any string value            |
+| `fieldVisibility`         | Visibility of generated fields.                                                     | `PUBLIC`                    | `PUBLIC`, `PRIVATE`         |
+| `stringType`              | String representation to use in generated classes.                                  | `String`                    | `String`, `CharSequence`, `Utf8` |
+| `optionalGetters`         | Enables optional getter methods for generated fields.                               | `false`                     | `true`, `false`             |
+| `useDecimalLogical`       | Enables support for decimal logical types in Avro schemas.                          | `false`                     | `true`, `false`             |
+| `createNullSafeAnnotations` | Adds null-safe annotations to generated classes.                                   | `false`                     | `true`, `false`             |
 
 ---
 
@@ -103,9 +106,18 @@ Contributions are welcome! To contribute:
 ---
 
 ## Authors
-- **Martins**
-  [GitHub](https://github.com/martinsjavacode)
-  Email: amartins.alexandre@hotmail.com
+<div style="display: flex; width: 100%; border: 1px solid #ddd; border-radius: 10px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); font-family: Arial, sans-serif; background: #333; overflow: hidden;">
+  <img src="https://avatars.githubusercontent.com/u/8130295?v=4" alt="Martins Photo" style="height: 200px; object-fit: contain;">
+  <div style="padding: 0 20px; text-align: left; flex: 1;">
+    <h2 style="font-size: 1.5em; color: #fff;">Alexandre Martins</h2>
+    <p style="font-size: 0.9em; color: #fff; margin-bottom: 15px;">Software Engineer with a strong passion for Java and building efficient, scalable solutions. Experienced in various tools and technologies, with a focus on delivering clean, high-quality code and driving innovation.</p>
+    <div style="display: inline-block; padding: 6px 10px; background: #007bff; color: #fff; text-decoration: none; border-radius: 5px; transition: background 0.3s ease;">
+        amartins.alexandre@hotmail.com
+    </div>
+  </div>
+</div>
+
+
 
 ---
 
