@@ -52,13 +52,12 @@ jacoco {
     reportsDirectory = layout.buildDirectory.dir("reports/jacoco")
 }
 
-val excludeRulesDir =
+val configurableFileTree =
     fileTree(
         layout.buildDirectory.dir("classes/kotlin/main")
     ) {
         exclude(
             "**/extension/*",
-            "**/generated/*",
         )
     }
 
@@ -69,11 +68,11 @@ tasks.jacocoTestReport {
         html.outputLocation.set(layout.buildDirectory.dir("jacoco/test/html"))
     }
 
-    classDirectories.setFrom(excludeRulesDir)
+    classDirectories.setFrom(configurableFileTree)
 }
 
 tasks.jacocoTestCoverageVerification {
-    classDirectories.setFrom(excludeRulesDir)
+    classDirectories.setFrom(configurableFileTree)
 
     violationRules {
         rule {

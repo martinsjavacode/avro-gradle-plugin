@@ -23,6 +23,9 @@ object AvroGenerator {
 
             val output = compiler.compileToDestination(file, outputDirectory)
             project.logger.lifecycle("Generated class: $output")
+        } ?: run {
+            project.logger.lifecycle("No Avro schema files found in $sourceDirectory")
+            return
         }
     }
 }
