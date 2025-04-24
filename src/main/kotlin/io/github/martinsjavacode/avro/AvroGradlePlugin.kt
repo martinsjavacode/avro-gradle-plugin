@@ -6,11 +6,11 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 
 class AvroGradlePlugin : Plugin<Project> {
-    override fun apply(project: Project) {
-        project.extensions
-            .create("avro", AvroPluginExtension::class.java)
+	override fun apply(project: Project) {
+		project.extensions
+			.create("avro", AvroPluginExtension::class.java)
 
-        project.tasks
-            .register("generateAvroClasses", AvroTask::class.java)
-    }
+		project.tasks
+			.register("generateAvroClasses", AvroTask::class.java)
+	}
 }
