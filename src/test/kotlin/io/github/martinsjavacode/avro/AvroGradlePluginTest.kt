@@ -117,13 +117,13 @@ class AvroGradlePluginTest : FunSpec({
                         }
 
                         avro {
-                            sourceDir = "src/main/resources/avro/schemas"
+                            sourceDir = "src/main/resources/avro"
                             outputDir = "build/generated/java"
                         }
                         """.trimIndent(),
                     )
 
-                    val avroDir = resolve("src/main/resources/avro/schemas").apply { mkdirs() }
+                    val avroDir = resolve("src/main/resources/avro/schemas/user").apply { mkdirs() }
 
                     val resourceDir = Path.of("src/test/resources/avro")
                     Files.walk(resourceDir).forEach { path ->
