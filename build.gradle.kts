@@ -58,6 +58,8 @@ val configurableFileTree =
     ) {
         exclude(
             "**/extension/*",
+			"**/task/*",
+			"**/AvroGradlePlugin*",
         )
     }
 

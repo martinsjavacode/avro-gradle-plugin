@@ -9,23 +9,46 @@ import org.gradle.api.Project
 import java.io.File
 
 object AvroGenerator {
-    fun generate(project: Project, extension: AvroPluginExtension, sourceDirectory: File, outputDirectory: File) {
-        sourceDirectory.listFiles { file -> file.extension == "avsc" }?.forEach { file ->
-            val schema = Schema.Parser().parse(file)
-            val compiler = SpecificCompiler(schema).apply {
-                isCreateOptionalGetters = extension.optionalGetters
-                isCreateSetters = extension.fieldVisibility == "PUBLIC"
-                isCreateNullSafeAnnotations = extension.createNullSafeAnnotations
-                setFieldVisibility(FieldVisibility.valueOf(extension.fieldVisibility))
-                setStringType(StringType.valueOf(extension.stringType))
-                setEnableDecimalLogicalType(extension.useDecimalLogical)
-            }
+	fun process(
+		sourceDir: File,
+		project: Project,
+		extension: AvroPluginExtension,
+		outputDirectory: File
+	) {
+		sourceDir.walkTopDown()
+			.filter { dir ->
+				dir.isDirectory && dir.walkTopDown().any { it.isFile }
+			}.forEach { subDir ->
+				generate(project, extension, subDir, outputDirectory)
+			}
+	}
 
-            val output = compiler.compileToDestination(file, outputDirectory)
-            project.logger.lifecycle("Generated class: $output")
-        } ?: run {
-            project.logger.lifecycle("No Avro schema files found in $sourceDirectory")
-            return
-        }
-    }
+	private fun generate(
+		project: Project,
+		extension: AvroPluginExtension,
+		sourceDirectory: File,
+		outputDirectory: File
+	) {
+		sourceDirectory.listFiles { file ->
+			file.extension == "avsc"
+		}.forEach { file ->
+			try {
+				val schema = Schema.Parser().parse(file)
+				val compiler = SpecificCompiler(schema).apply {
+					isCreateOptionalGetters = extension.optionalGetters
+					isCreateSetters = extension.fieldVisibility == "PUBLIC"
+					isCreateNullSafeAnnotations = extension.createNullSafeAnnotations
+					setFieldVisibility(FieldVisibility.valueOf(extension.fieldVisibility))
+					setStringType(StringType.valueOf(extension.stringType))
+					setEnableDecimalLogicalType(extension.useDecimalLogical)
+				}
+
+				compiler.compileToDestination(file, outputDirectory)
+
+				project.logger.lifecycle("Generated class: ${schema.name}")
+			} catch (e: Exception) {
+				project.logger.error("Error processing file: ${file.name}", e)
+			}
+		}
+	}
 }
