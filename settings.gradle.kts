@@ -15,6 +15,7 @@ pluginManagement {
         `maven-publish`
         id("com.gradle.plugin-publish") version gradlePluginVersion
         id("org.jlleitschuh.gradle.ktlint") version ktlintVersion
+        jacoco
     }
 }
 

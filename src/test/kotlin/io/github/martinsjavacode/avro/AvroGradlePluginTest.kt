@@ -29,10 +29,10 @@ class AvroGradlePluginTest : FunSpec({
                     val avroDir = resolve("src/main/resources/avro").apply { mkdirs() }
 
                     val resourceDir = Path.of("src/test/resources/avro")
-                    Files.walk(resourceDir).forEach { file ->
-                        if (file.toFile().isFile && file.toString().endsWith(".avsc")) {
-                            file.toFile()
-                                .copyTo(avroDir.resolve(file.fileName.toString()), overwrite = true)
+                    Files.walk(resourceDir).forEach { path ->
+                        if (path.toFile().isFile && path.toString().endsWith(".avsc")) {
+                            path.toFile()
+                                .copyTo(avroDir.resolve(path.fileName.toString()), overwrite = true)
                         }
                     }
                 }
@@ -77,10 +77,10 @@ class AvroGradlePluginTest : FunSpec({
                     val avroDir = resolve("src/main/resources/schemas").apply { mkdirs() }
 
                     val resourceDir = Path.of("src/test/resources/avro")
-                    Files.walk(resourceDir).forEach { file ->
-                        if (file.toFile().isFile && file.toString().endsWith(".avsc")) {
-                            file.toFile()
-                                .copyTo(avroDir.resolve(file.fileName.toString()), overwrite = true)
+                    Files.walk(resourceDir).forEach { path ->
+                        if (path.toFile().isFile && path.toString().endsWith(".avsc")) {
+                            path.toFile()
+                                .copyTo(avroDir.resolve(path.fileName.toString()), overwrite = true)
                         }
                     }
                 }
@@ -126,10 +126,10 @@ class AvroGradlePluginTest : FunSpec({
                     val avroDir = resolve("src/main/resources/avro/schemas").apply { mkdirs() }
 
                     val resourceDir = Path.of("src/test/resources/avro")
-                    Files.walk(resourceDir).forEach { file ->
-                        if (file.toFile().isFile && file.toString().endsWith(".avsc")) {
-                            file.toFile()
-                                .copyTo(avroDir.resolve(file.fileName.toString()), overwrite = true)
+                    Files.walk(resourceDir).forEach { path ->
+                        if (path.toFile().isFile && path.toString().endsWith(".avsc")) {
+                            path.toFile()
+                                .copyTo(avroDir.resolve(path.fileName.toString()), overwrite = true)
                         }
                     }
                 }

@@ -6,6 +6,7 @@ plugins {
     id("idea")
     id("com.gradle.plugin-publish")
     id("org.jlleitschuh.gradle.ktlint")
+    jacoco
 }
 
 group = "io.github.martinsjavacode"
@@ -28,6 +29,7 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
+    finalizedBy(tasks.jacocoTestReport)
 }
 
 gradlePlugin {
@@ -43,4 +45,46 @@ gradlePlugin {
             tags.set(listOf("avro", "generator", "serialization", "java", "avsc"))
         }
     }
+}
+
+jacoco {
+    toolVersion = "${property("jacocoVersion")}"
+    reportsDirectory = layout.buildDirectory.dir("reports/jacoco")
+}
+
+val configurableFileTree =
+    fileTree(
+        layout.buildDirectory.dir("classes/kotlin/main")
+    ) {
+        exclude(
+            "**/extension/*",
+        )
+    }
+
+tasks.jacocoTestReport {
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+        html.outputLocation.set(layout.buildDirectory.dir("jacoco/test/html"))
+    }
+
+    classDirectories.setFrom(configurableFileTree)
+}
+
+tasks.jacocoTestCoverageVerification {
+    classDirectories.setFrom(configurableFileTree)
+
+    violationRules {
+        rule {
+            limit {
+                minimum = BigDecimal.valueOf(0.9)
+            }
+        }
+    }
+
+    dependsOn(tasks.jacocoTestReport)
+}
+
+tasks.check {
+    dependsOn(tasks.jacocoTestCoverageVerification)
 }
