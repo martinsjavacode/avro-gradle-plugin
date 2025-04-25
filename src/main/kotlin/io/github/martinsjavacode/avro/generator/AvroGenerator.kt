@@ -13,7 +13,7 @@ object AvroGenerator {
 		sourceDir: File,
 		project: Project,
 		extension: AvroPluginExtension,
-		outputDirectory: File
+		outputDirectory: File,
 	) {
 		sourceDir.walkTopDown()
 			.filter { dir ->
@@ -27,21 +27,22 @@ object AvroGenerator {
 		project: Project,
 		extension: AvroPluginExtension,
 		sourceDirectory: File,
-		outputDirectory: File
+		outputDirectory: File,
 	) {
 		sourceDirectory.listFiles { file ->
 			file.extension == "avsc"
 		}.forEach { file ->
 			try {
 				val schema = Schema.Parser().parse(file)
-				val compiler = SpecificCompiler(schema).apply {
-					isCreateOptionalGetters = extension.optionalGetters
-					isCreateSetters = extension.fieldVisibility == "PUBLIC"
-					isCreateNullSafeAnnotations = extension.createNullSafeAnnotations
-					setFieldVisibility(FieldVisibility.valueOf(extension.fieldVisibility))
-					setStringType(StringType.valueOf(extension.stringType))
-					setEnableDecimalLogicalType(extension.useDecimalLogical)
-				}
+				val compiler =
+					SpecificCompiler(schema).apply {
+						isCreateOptionalGetters = extension.optionalGetters
+						isCreateSetters = extension.fieldVisibility == "PUBLIC"
+						isCreateNullSafeAnnotations = extension.createNullSafeAnnotations
+						setFieldVisibility(FieldVisibility.valueOf(extension.fieldVisibility))
+						setStringType(StringType.valueOf(extension.stringType))
+						setEnableDecimalLogicalType(extension.useDecimalLogical)
+					}
 
 				compiler.compileToDestination(file, outputDirectory)
 
