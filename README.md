@@ -1,5 +1,16 @@
 # Avro Gradle Plugin
 
+[![Gradle Plugin Portal](https://img.shields.io/maven-metadata/v/https/plugins.gradle.org/m2/io/github/martinsjavacode/avro-gradle-plugin/maven-metadata.xml.svg)](https://plugins.gradle.org/plugin/io.github.martinsjavacode.avro-gradle-plugin)
+[![Release Gradle Plugin](https://github.com/martinsjavacode/avro-gradle-plugin/actions/workflows/release.yaml/badge.svg)](https://github.com/martinsjavacode/avro-gradle-plugin/actions/workflows/release.yaml)
+[![Tests](https://github.com/martinsjavacode/avro-gradle-plugin/actions/workflows/test.yaml/badge.svg)](https://github.com/martinsjavacode/avro-gradle-plugin/actions/workflows/test.yaml)
+[![CodeQL Analysis](https://github.com/martinsjavacode/avro-gradle-plugin/actions/workflows/codeql-analysis.yaml/badge.svg)](https://github.com/martinsjavacode/avro-gradle-plugin/actions/workflows/codeql-analysis.yaml)
+[![Dependabot Updates](https://github.com/martinsjavacode/avro-gradle-plugin/actions/workflows/dependabot/dependabot-updates/badge.svg)](https://github.com/martinsjavacode/avro-gradle-plugin/actions/workflows/dependabot/dependabot-updates)
+[![Code Coverage](https://codecov.io/gh/martinsjavacode/avro-gradle-plugin/branch/main/graph/badge.svg?token=2Q0X1G3J9E)](https://codecov.io/gh/martinsjavacode/avro-gradle-plugin)
+![GitHub last commit](https://img.shields.io/github/last-commit/martinsjavacode/avro-gradle-plugin)
+
+
+
+
 The **Avro Gradle Plugin** simplifies the process of generating Java classes from Avro schema files (`*.avsc`). With a focus on flexibility and ease of use, this plugin integrates seamlessly into the Gradle build process, offering extensive customization options for developers.
 
 ---
