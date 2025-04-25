@@ -51,7 +51,7 @@ jobs:
           fetch-depth: 0
 
       - name: Create bump and changelog
-        uses: commitizen-tools/commitizen-action@v4
+        uses: commitizen-tools/commitizen-action@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
