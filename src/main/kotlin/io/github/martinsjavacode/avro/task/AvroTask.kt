@@ -12,10 +12,12 @@ abstract class AvroTask : DefaultTask() {
 
 	@TaskAction
 	fun generateAvroClasses() {
-		val sourceDirectory = extension.sourceDir?.let { project.file(it) }
-			?: project.file("src/main/resources/avro")
-		val outputDirectory = extension.outputDir?.let { project.file(it) }
-			?: project.file("build/generated/java")
+		val sourceDirectory =
+			extension.sourceDir?.let { project.file(it) }
+				?: project.file("src/main/resources/avro")
+		val outputDirectory =
+			extension.outputDir?.let { project.file(it) }
+				?: project.file("build/generated/java")
 
 		outputDirectory.deleteRecursively()
 		outputDirectory.mkdirs()
@@ -31,7 +33,7 @@ abstract class AvroTask : DefaultTask() {
 			sourceDir = finalSourceDir,
 			project = project,
 			extension = extension,
-			outputDirectory = outputDirectory
+			outputDirectory = outputDirectory,
 		)
 
 		project.logger.lifecycle("Avro classes generated successfully")
@@ -41,19 +43,20 @@ abstract class AvroTask : DefaultTask() {
 		val propertyFile = project.file("application.properties")
 		val yamlFile = project.file("application.yml")
 
-		val customSourceDir = when {
-			propertyFile.exists() -> {
-				Properties().apply { load(propertyFile.inputStream()) }
-					.getProperty("sourceDirectory")
-			}
+		val customSourceDir =
+			when {
+				propertyFile.exists() -> {
+					Properties().apply { load(propertyFile.inputStream()) }
+						.getProperty("sourceDirectory")
+				}
 
-			yamlFile.exists() -> {
-				Properties().apply { load(yamlFile.inputStream()) }
-					.getProperty("sourceDirectory")
-			}
+				yamlFile.exists() -> {
+					Properties().apply { load(yamlFile.inputStream()) }
+						.getProperty("sourceDirectory")
+				}
 
-			else -> null
-		}
+				else -> null
+			}
 
 		return customSourceDir?.let { project.file(it) } ?: defaultSourceDir
 	}

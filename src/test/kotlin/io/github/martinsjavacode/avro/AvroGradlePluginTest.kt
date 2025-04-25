@@ -42,10 +42,10 @@ class AvroGradlePluginTest : FunSpec({
 					resolve("settings.gradle.kts").writeText("")
 					resolve("build.gradle.kts").writeText(
 						"""
-                        plugins {
-                            id("io.github.martinsjavacode.avro-gradle-plugin")
-                        }
-                        """.trimIndent(),
+						plugins {
+						    id("io.github.martinsjavacode.avro-gradle-plugin")
+						}
+						""".trimIndent(),
 					)
 
 					val avroDir = resolve("src/main/resources/avro").apply { mkdirs() }
@@ -84,16 +84,16 @@ class AvroGradlePluginTest : FunSpec({
 					resolve("settings.gradle.kts").writeText("")
 					resolve("build.gradle.kts").writeText(
 						"""
-                        plugins {
-                            id("io.github.martinsjavacode.avro-gradle-plugin")
-                        }
+						plugins {
+						    id("io.github.martinsjavacode.avro-gradle-plugin")
+						}
 
-                        avro {
-                            sourceDir = "src/main/resources/schemas"
-                            outputDir = "build/generated/avro"
-                            optionalGetters = true
-                        }
-                        """.trimIndent(),
+						avro {
+						    sourceDir = "src/main/resources/schemas"
+						    outputDir = "build/generated/avro"
+						    optionalGetters = true
+						}
+						""".trimIndent(),
 					)
 
 					val avroDir = resolve("src/main/resources/schemas").apply { mkdirs() }
@@ -134,15 +134,15 @@ class AvroGradlePluginTest : FunSpec({
 					resolve("settings.gradle.kts").writeText("")
 					resolve("build.gradle.kts").writeText(
 						"""
-                        plugins {
-                            id("io.github.martinsjavacode.avro-gradle-plugin")
-                        }
+						plugins {
+						    id("io.github.martinsjavacode.avro-gradle-plugin")
+						}
 
-                        avro {
-                            sourceDir = "src/main/resources/avro"
-                            outputDir = "build/generated/java"
-                        }
-                        """.trimIndent(),
+						avro {
+						    sourceDir = "src/main/resources/avro"
+						    outputDir = "build/generated/java"
+						}
+						""".trimIndent(),
 					)
 
 					val avroDir = resolve("src/main/resources/avro/schemas/user").apply { mkdirs() }

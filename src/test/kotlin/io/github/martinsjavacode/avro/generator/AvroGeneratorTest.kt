@@ -19,10 +19,11 @@ class AvroGeneratorTest : FunSpec({
 	lateinit var outputDirectory: File
 
 	beforeTest {
-		extension = mockk(relaxed = true) {
-			every { fieldVisibility } returns "PUBLIC"
-			every { stringType } returns "String"
-		}
+		extension =
+			mockk(relaxed = true) {
+				every { fieldVisibility } returns "PUBLIC"
+				every { stringType } returns "String"
+			}
 		project = mockk(relaxed = true)
 
 		sourceDirectory = createTempDirectory("sourceDir").toFile()
@@ -35,7 +36,7 @@ class AvroGeneratorTest : FunSpec({
 				path.toFile()
 					.copyTo(
 						sourceDirectory.resolve(path.fileName.toString()),
-						overwrite = true
+						overwrite = true,
 					)
 			}
 		}
@@ -56,7 +57,7 @@ class AvroGeneratorTest : FunSpec({
 						{"name": "age", "type": ["null", "int"], "default": null}
 					]
 				}
-			""".trimIndent()
+				""".trimIndent(),
 			)
 		}
 	}
@@ -78,7 +79,7 @@ class AvroGeneratorTest : FunSpec({
 			sourceDir = sourceDirectory,
 			project = project,
 			extension = extension,
-			outputDirectory = outputDirectory
+			outputDirectory = outputDirectory,
 		)
 
 		verify(exactly = 2) { anyConstructed<Schema.Parser>().parse(any<File>()) }
@@ -87,9 +88,10 @@ class AvroGeneratorTest : FunSpec({
 
 	test("should handle invalid schema files gracefully") {
 		File(sourceDirectory, "schema1.avsc").delete()
-		val invalidFile = File(sourceDirectory, "invalidSchema.avsc").apply {
-			writeText("{ invalid-json }")
-		}
+		val invalidFile =
+			File(sourceDirectory, "invalidSchema.avsc").apply {
+				writeText("{ invalid-json }")
+			}
 
 		mockkConstructor(Schema.Parser::class)
 		every { anyConstructed<Schema.Parser>().parse(invalidFile) } throws IOException("Invalid schema")
@@ -98,7 +100,7 @@ class AvroGeneratorTest : FunSpec({
 			sourceDir = sourceDirectory,
 			project = project,
 			extension = extension,
-			outputDirectory = outputDirectory
+			outputDirectory = outputDirectory,
 		)
 
 		verify { project.logger.error("Error processing file: ${invalidFile.name}", any()) }
@@ -114,7 +116,7 @@ class AvroGeneratorTest : FunSpec({
 			sourceDir = sourceDirectory,
 			project = project,
 			extension = extension,
-			outputDirectory = outputDirectory
+			outputDirectory = outputDirectory,
 		)
 
 		verify(exactly = 0) { anyConstructed<Schema.Parser>().parse(any<File>()) }
