@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up JDK
         uses: actions/setup-java@v4
@@ -45,7 +45,7 @@ jobs:
       version: ${{ env.REVISION }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-tags: 'true'
           fetch-depth: 0
@@ -64,7 +64,7 @@ jobs:
       contents: read
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           ref: v${{ needs.bump-version.outputs.version }}
 
