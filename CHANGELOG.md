@@ -1,3 +1,14 @@
+## v1.2.0 (2025-12-10)
+
+### Feat
+
+- add Codecov integration for code coverage reporting
+- Enhance Avro plugin with schema validation and caching options
+
+### Fix
+
+- replace deprecated createTempDir with createTempDirectory
+
 ## v1.1.0 (2025-04-25)
 
 ### Refactor
