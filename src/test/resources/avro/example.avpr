@@ -1,0 +1,22 @@
+{
+  "protocol": "OrderProtocol",
+  "namespace": "com.example.orders",
+  "types": [
+    {
+      "type": "record",
+      "name": "Order",
+      "fields": [
+        {"name": "orderId", "type": "long"},
+        {"name": "customerId", "type": "string"},
+        {"name": "amount", "type": "double"},
+        {"name": "timestamp", "type": "long"}
+      ]
+    },
+    {
+      "type": "enum",
+      "name": "OrderStatus",
+      "symbols": ["PENDING", "CONFIRMED", "SHIPPED", "DELIVERED", "CANCELLED"]
+    }
+  ],
+  "messages": {}
+}

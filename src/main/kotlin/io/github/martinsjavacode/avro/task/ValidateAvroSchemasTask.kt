@@ -1,21 +1,17 @@
 package io.github.martinsjavacode.avro.task
 
 import io.github.martinsjavacode.avro.extension.AvroPluginExtension
-import io.github.martinsjavacode.avro.generator.AvroGenerator
+import io.github.martinsjavacode.avro.validator.SchemaValidator
 import org.gradle.api.DefaultTask
-import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.FileTree
-import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.InputFiles
-import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import java.io.File
 import java.util.*
 
-@CacheableTask
-abstract class AvroTask : DefaultTask() {
+abstract class ValidateAvroSchemasTask : DefaultTask() {
 	private var extension: AvroPluginExtension = project.extensions.getByType(AvroPluginExtension::class.java)
 
 	@get:InputFiles
@@ -31,26 +27,11 @@ abstract class AvroTask : DefaultTask() {
 			}
 		}
 
-	@get:OutputDirectory
-	abstract val outputDir: DirectoryProperty
-
-	init {
-		outputDir.convention(
-			project.layout.buildDirectory.dir(
-				extension.outputDir ?: "generated/java",
-			),
-		)
-	}
-
 	@TaskAction
-	fun generateAvroClasses() {
+	fun validate() {
 		val sourceDirectory =
 			extension.sourceDir?.let { project.file(it) }
 				?: project.file("src/main/resources/avro")
-		val outputDirectory = outputDir.get().asFile
-
-		outputDirectory.mkdirs()
-
 		val finalSourceDir = resolveCustomSourceDir(sourceDirectory)
 
 		if (!finalSourceDir.exists()) {
@@ -58,14 +39,16 @@ abstract class AvroTask : DefaultTask() {
 			return
 		}
 
-		AvroGenerator.process(
-			sourceDir = finalSourceDir,
-			project = project,
-			extension = extension,
-			outputDirectory = outputDirectory,
-		)
+		val validator = SchemaValidator(project)
+		val results = validator.validate(finalSourceDir)
 
-		project.logger.lifecycle("Avro classes generated successfully")
+		if (results.hasErrors()) {
+			project.logger.error("Schema validation failed:")
+			results.errors.forEach { project.logger.error("  ✗ $it") }
+			throw IllegalStateException("Found ${results.errors.size} validation error(s)")
+		}
+
+		project.logger.lifecycle("✓ All schemas validated successfully (${results.validatedCount} files)")
 	}
 
 	private fun resolveCustomSourceDir(defaultSourceDir: File): File {

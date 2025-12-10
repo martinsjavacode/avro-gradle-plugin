@@ -57,8 +57,6 @@ val configurableFileTree =
 		layout.buildDirectory.dir("classes/kotlin/main"),
 	) {
 		exclude(
-			"**/extension/*",
-			"**/task/*",
 			"**/AvroGradlePlugin*",
 		)
 	}
