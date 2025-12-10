@@ -7,6 +7,7 @@ import io.mockk.mockk
 import org.gradle.api.Project
 import org.gradle.api.logging.Logger
 import java.io.File
+import kotlin.io.path.createTempDirectory
 
 class ValidationEdgeCasesTest :
 	StringSpec({
@@ -16,7 +17,7 @@ class ValidationEdgeCasesTest :
 			every { project.logger } returns logger
 
 			val validator = SchemaValidator(project)
-			val tempDir = createTempDir()
+			val tempDir = createTempDirectory("test").toFile()
 
 			File(tempDir, "complex.avsc").writeText(
 				"""
@@ -76,7 +77,7 @@ class ValidationEdgeCasesTest :
 			every { project.logger } returns logger
 
 			val validator = SchemaValidator(project)
-			val tempDir = createTempDir()
+			val tempDir = createTempDirectory("test").toFile()
 
 			File(tempDir, "blank-field.avsc").writeText(
 				"""
@@ -104,7 +105,7 @@ class ValidationEdgeCasesTest :
 			every { project.logger } returns logger
 
 			val validator = SchemaValidator(project)
-			val tempDir = createTempDir()
+			val tempDir = createTempDirectory("test").toFile()
 
 			// Union vazia não é um JSON válido, vou usar um caso mais realista
 			File(tempDir, "valid-union.avsc").writeText(
@@ -136,7 +137,7 @@ class ValidationEdgeCasesTest :
 			every { project.logger } returns logger
 
 			val validator = SchemaValidator(project)
-			val tempDir = createTempDir()
+			val tempDir = createTempDirectory("test").toFile()
 
 			File(tempDir, "primitives.avsc").writeText(
 				"""
@@ -171,7 +172,7 @@ class ValidationEdgeCasesTest :
 			every { project.logger } returns logger
 
 			val validator = SchemaValidator(project)
-			val tempDir = createTempDir()
+			val tempDir = createTempDirectory("test").toFile()
 
 			File(tempDir, "fixed.avsc").writeText(
 				"""
@@ -207,7 +208,7 @@ class ValidationEdgeCasesTest :
 			every { project.logger } returns logger
 
 			val validator = SchemaValidator(project)
-			val tempDir = createTempDir()
+			val tempDir = createTempDirectory("test").toFile()
 
 			File(tempDir, "record.avsc").writeText(
 				"""

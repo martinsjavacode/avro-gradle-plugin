@@ -7,6 +7,7 @@ import io.mockk.mockk
 import org.gradle.api.Project
 import org.gradle.api.logging.Logger
 import java.io.File
+import kotlin.io.path.createTempDirectory
 
 class SchemaValidatorTest :
 	StringSpec({
@@ -16,7 +17,7 @@ class SchemaValidatorTest :
 			every { project.logger } returns logger
 
 			val validator = SchemaValidator(project)
-			val tempDir = createTempDir()
+			val tempDir = createTempDirectory().toFile()
 
 			File(tempDir, "user.avsc").writeText(
 				"""
@@ -46,7 +47,7 @@ class SchemaValidatorTest :
 			every { project.logger } returns logger
 
 			val validator = SchemaValidator(project)
-			val tempDir = createTempDir()
+			val tempDir = createTempDirectory("test").toFile()
 
 			File(tempDir, "empty.avsc").writeText(
 				"""
@@ -73,7 +74,7 @@ class SchemaValidatorTest :
 			every { project.logger } returns logger
 
 			val validator = SchemaValidator(project)
-			val tempDir = createTempDir()
+			val tempDir = createTempDirectory("test").toFile()
 
 			File(tempDir, "user.avsc").writeText(
 				"""
@@ -109,7 +110,7 @@ class SchemaValidatorTest :
 			every { project.logger } returns logger
 
 			val validator = SchemaValidator(project)
-			val tempDir = createTempDir()
+			val tempDir = createTempDirectory("test").toFile()
 
 			File(tempDir, "protocol.avpr").writeText(
 				"""
@@ -141,7 +142,7 @@ class SchemaValidatorTest :
 			every { project.logger } returns logger
 
 			val validator = SchemaValidator(project)
-			val tempDir = createTempDir()
+			val tempDir = createTempDirectory("test").toFile()
 
 			File(tempDir, "status.avsc").writeText(
 				"""
@@ -168,7 +169,7 @@ class SchemaValidatorTest :
 			every { project.logger } returns logger
 
 			val validator = SchemaValidator(project)
-			val tempDir = createTempDir()
+			val tempDir = createTempDirectory("test").toFile()
 
 			File(tempDir, "empty-enum.avsc").writeText(
 				"""
@@ -194,7 +195,7 @@ class SchemaValidatorTest :
 			every { project.logger } returns logger
 
 			val validator = SchemaValidator(project)
-			val tempDir = createTempDir()
+			val tempDir = createTempDirectory("test").toFile()
 
 			File(tempDir, "nested.avsc").writeText(
 				"""
@@ -232,7 +233,7 @@ class SchemaValidatorTest :
 			every { project.logger } returns logger
 
 			val validator = SchemaValidator(project)
-			val tempDir = createTempDir()
+			val tempDir = createTempDirectory("test").toFile()
 
 			File(tempDir, "array.avsc").writeText(
 				"""
@@ -267,7 +268,7 @@ class SchemaValidatorTest :
 			every { project.logger } returns logger
 
 			val validator = SchemaValidator(project)
-			val tempDir = createTempDir()
+			val tempDir = createTempDirectory("test").toFile()
 
 			File(tempDir, "map.avsc").writeText(
 				"""
@@ -302,7 +303,7 @@ class SchemaValidatorTest :
 			every { project.logger } returns logger
 
 			val validator = SchemaValidator(project)
-			val tempDir = createTempDir()
+			val tempDir = createTempDirectory("test").toFile()
 
 			File(tempDir, "union.avsc").writeText(
 				"""
