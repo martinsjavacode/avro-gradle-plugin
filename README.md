@@ -29,15 +29,20 @@ The **Avro Gradle Plugin** simplifies the process of generating Java classes fro
 
 ## **Features**
 - **Automatic Java Class Generation**: Generate Java classes directly from Avro schema files.
+- **Multiple Schema Formats**: Support for `.avsc` (JSON) and `.avpr` (Protocol) files.
+- **Incremental Build Cache**: Gradle build cache support for faster incremental builds.
+- **Schema Validation**: Dedicated task to validate schemas before generation.
+- **HTML Reports**: Automatic generation of detailed HTML reports with build statistics.
 - **Customizable Directories**: Specify source and output directories for Avro schema files and generated classes.
 - **Field Visibility Control**: Configure fields as `PUBLIC` or `PRIVATE`.
 - **String Type Selection**: Choose between `String`, `CharSequence`, or `Utf8` for string representations.
 - **Optional Getters**: Enable or disable optional getter methods in the generated classes.
 - **Null-Safe Annotations**: Optionally add null-safe annotations to generated classes.
 - **Decimal Logical Type Support**: Enable support for decimal logical types in Avro schemas.
+- **Enhanced Error Handling**: Detailed error messages with file-specific context.
 - **Gradle Integration**: Fully integrates with both Kotlin DSL and Groovy DSL.
 - **Multiple Schema File Support**: Process multiple Avro schema files effortlessly.
-- **Automatic Task Creation**: Automatically adds a `generateAvroClasses` task to your Gradle workflow.
+- **Automatic Task Creation**: Automatically adds tasks to your Gradle workflow.
 - **Simple Configuration**: Intuitive configuration options for quick setup.
 ---
 
@@ -53,11 +58,17 @@ Define configuration options in the `avro` block within your project's `build.gr
 
 | **Option**                | **Description**                                                                     | **Default Value**            | **Allowed Values**           |
 |---------------------------|-------------------------------------------------------------------------------------|-----------------------------|-----------------------------|
-| `sourceDir`               | Directory containing Avro schema files (`*.avsc`).                                  | `src/main/resources/avro`   | Custom directory path       |
+| `sourceDir`               | Directory containing Avro schema files (`*.avsc`, `*.avpr`).                        | `src/main/resources/avro`   | Custom directory path       |
 | `outputDir`               | Directory to save generated Java classes.                                           | `build/generated/java`      | Custom directory path       |
-| `group`                   | Gradle task group.                                                                  | `build`                     | Any string value            |
-| `description`             | Description of the Gradle task.                                                     | _Plugin description_        | Any string value            |
 | `fieldVisibility`         | Visibility of generated fields.                                                     | `PUBLIC`                    | `PUBLIC`, `PRIVATE`         |
+| `stringType`              | String representation to use in generated classes.                                  | `String`                    | `String`, `CharSequence`, `Utf8` |
+| `optionalGetters`         | Enables optional getter methods for generated fields.                               | `false`                     | `true`, `false`             |
+| `useDecimalLogical`       | Enables support for decimal logical types in Avro schemas.                          | `false`                     | `true`, `false`             |
+| `createNullSafeAnnotations` | Adds null-safe annotations to generated classes.                                   | `false`                     | `true`, `false`             |
+| `enableCache`             | Enables Gradle build cache for incremental builds.                                  | `true`                      | `true`, `false`             |
+| `validateBeforeGenerate`  | Validates schemas before generation.                                                | `true`                      | `true`, `false`             |
+| `generateBuilders`        | Generates builder pattern classes (coming soon).                                    | `false`                     | `true`, `false`             |
+| `addCustomHeader`         | Adds custom header to generated files (coming soon).                                | `null`                      | Any string value            |
 | `stringType`              | String representation to use in generated classes.                                  | `String`                    | `String`, `CharSequence`, `Utf8` |
 | `optionalGetters`         | Enables optional getter methods for generated fields.                               | `false`                     | `true`, `false`             |
 | `useDecimalLogical`       | Enables support for decimal logical types in Avro schemas.                          | `false`                     | `true`, `false`             |

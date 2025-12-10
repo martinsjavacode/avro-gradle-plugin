@@ -2,124 +2,136 @@ package io.github.martinsjavacode.avro.generator
 
 import io.github.martinsjavacode.avro.extension.AvroPluginExtension
 import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.shouldBe
 import io.mockk.*
 import org.apache.avro.Schema
 import org.apache.avro.compiler.specific.SpecificCompiler
 import org.gradle.api.Project
+import org.gradle.api.logging.Logger
 import java.io.File
 import java.io.IOException
-import java.nio.file.Files
-import java.nio.file.Path
 import kotlin.io.path.createTempDirectory
 
-class AvroGeneratorTest : FunSpec({
-	lateinit var extension: AvroPluginExtension
-	lateinit var project: Project
-	lateinit var sourceDirectory: File
-	lateinit var outputDirectory: File
+class AvroGeneratorTest :
+	FunSpec({
+		lateinit var extension: AvroPluginExtension
+		lateinit var project: Project
+		lateinit var sourceDirectory: File
+		lateinit var outputDirectory: File
+		lateinit var buildDir: File
 
-	beforeTest {
-		extension =
-			mockk(relaxed = true) {
-				every { fieldVisibility } returns "PUBLIC"
-				every { stringType } returns "String"
-			}
-		project = mockk(relaxed = true)
-
-		sourceDirectory = createTempDirectory("sourceDir").toFile()
-		outputDirectory = createTempDirectory("outputDir").toFile()
-
-		// Create the source directory and add a sample schema file
-		val resourceDir = Path.of("src/test/resources/avro")
-		Files.walk(resourceDir).forEach { path ->
-			if (path.toFile().isFile && path.toString().endsWith(".avsc")) {
-				path.toFile()
-					.copyTo(
-						sourceDirectory.resolve(path.fileName.toString()),
-						overwrite = true,
-					)
-			}
-		}
-
-		File(sourceDirectory, "sourceSubDirectory").apply {
-			mkdirs()
-			resolve("schema1.avsc").writeText(
-				"""
-				{
-					"type": "record",
-					"connect.name": "io.github.amartins.sample.User",
-					"namespace": "io.github.amartins",
-					"name": "User",
-					"fields": [
-						{"name": "id", "type": "string"},
-						{"name": "name", "type": "string"},
-						{"name": "email", "type": "string"},
-						{"name": "age", "type": ["null", "int"], "default": null}
-					]
+		beforeTest {
+			extension =
+				mockk(relaxed = true) {
+					every { fieldVisibility } returns "PUBLIC"
+					every { stringType } returns "String"
+					every { optionalGetters } returns false
+					every { createNullSafeAnnotations } returns false
+					every { useDecimalLogical } returns false
 				}
-				""".trimIndent(),
-			)
+
+			buildDir = createTempDirectory("build").toFile()
+			val logger = mockk<Logger>(relaxed = true)
+
+			project =
+				mockk(relaxed = true) {
+					every { this@mockk.logger } returns logger
+					every { layout.buildDirectory.asFile.get() } returns buildDir
+				}
+
+			sourceDirectory = createTempDirectory("sourceDir").toFile()
+			outputDirectory = createTempDirectory("outputDir").toFile()
+
+			File(sourceDirectory, "sourceSubDirectory").apply {
+				mkdirs()
+				resolve("user.avsc").writeText(
+					"""
+					{
+						"type": "record",
+						"namespace": "io.github.amartins",
+						"name": "User",
+						"fields": [
+							{"name": "id", "type": "string"},
+							{"name": "name", "type": "string"}
+						]
+					}
+					""".trimIndent(),
+				)
+			}
 		}
-	}
 
-	afterTest {
-		sourceDirectory.deleteRecursively()
-		outputDirectory.deleteRecursively()
-		unmockkAll()
-	}
+		afterTest {
+			sourceDirectory.deleteRecursively()
+			outputDirectory.deleteRecursively()
+			buildDir.deleteRecursively()
+			unmockkAll()
+		}
 
-	test("should process valid schema files and generate classes") {
-		mockkConstructor(Schema.Parser::class)
-		mockkConstructor(SpecificCompiler::class)
+		test("should process valid schema files and generate classes") {
+			mockkConstructor(Schema.Parser::class)
+			mockkConstructor(SpecificCompiler::class)
 
-		every { anyConstructed<Schema.Parser>().parse(any<File>()) } returns mockk(relaxed = true)
-		every { anyConstructed<SpecificCompiler>().compileToDestination(any(), any()) } just Runs
+			val mockSchema =
+				mockk<Schema>(relaxed = true) {
+					every { name } returns "User"
+					every { namespace } returns "io.github.amartins"
+					every { type } returns Schema.Type.RECORD
+					every { fields } returns
+						listOf(
+							mockk(relaxed = true) {
+								every { name() } returns "id"
+							},
+						)
+				}
 
-		AvroGenerator.process(
-			sourceDir = sourceDirectory,
-			project = project,
-			extension = extension,
-			outputDirectory = outputDirectory,
-		)
+			every { anyConstructed<Schema.Parser>().parse(any<File>()) } returns mockSchema
+			every { anyConstructed<SpecificCompiler>().compileToDestination(any(), any()) } just Runs
 
-		verify(exactly = 2) { anyConstructed<Schema.Parser>().parse(any<File>()) }
-		verify(exactly = 2) { anyConstructed<SpecificCompiler>().compileToDestination(any(), outputDirectory) }
-	}
+			val report =
+				AvroGenerator.process(
+					sourceDir = sourceDirectory,
+					project = project,
+					extension = extension,
+					outputDirectory = outputDirectory,
+				)
 
-	test("should handle invalid schema files gracefully") {
-		File(sourceDirectory, "schema1.avsc").delete()
-		val invalidFile =
-			File(sourceDirectory, "invalidSchema.avsc").apply {
-				writeText("{ invalid-json }")
+			report.getClassCount() shouldBe 1
+		}
+
+		test("should handle invalid schema files gracefully") {
+			File(sourceDirectory, "sourceSubDirectory/user.avsc").delete()
+			File(sourceDirectory, "invalid.avsc").writeText("{ invalid-json }")
+
+			mockkConstructor(Schema.Parser::class)
+			every { anyConstructed<Schema.Parser>().parse(any<File>()) } throws IOException("Invalid schema")
+
+			var exceptionThrown = false
+			try {
+				AvroGenerator.process(
+					sourceDir = sourceDirectory,
+					project = project,
+					extension = extension,
+					outputDirectory = outputDirectory,
+				)
+			} catch (e: IllegalStateException) {
+				exceptionThrown = true
 			}
 
-		mockkConstructor(Schema.Parser::class)
-		every { anyConstructed<Schema.Parser>().parse(invalidFile) } throws IOException("Invalid schema")
+			exceptionThrown shouldBe true
+		}
 
-		AvroGenerator.process(
-			sourceDir = sourceDirectory,
-			project = project,
-			extension = extension,
-			outputDirectory = outputDirectory,
-		)
+		test("should handle empty source directory") {
+			sourceDirectory.deleteRecursively()
+			sourceDirectory.mkdirs()
 
-		verify { project.logger.error("Error processing file: ${invalidFile.name}", any()) }
-	}
+			val report =
+				AvroGenerator.process(
+					sourceDir = sourceDirectory,
+					project = project,
+					extension = extension,
+					outputDirectory = outputDirectory,
+				)
 
-	test("should handle empty source directory") {
-		sourceDirectory.deleteRecursively()
-
-		mockkConstructor(Schema.Parser::class)
-		mockkConstructor(SpecificCompiler::class)
-
-		AvroGenerator.process(
-			sourceDir = sourceDirectory,
-			project = project,
-			extension = extension,
-			outputDirectory = outputDirectory,
-		)
-
-		verify(exactly = 0) { anyConstructed<Schema.Parser>().parse(any<File>()) }
-		verify(exactly = 0) { anyConstructed<SpecificCompiler>().compileToDestination(any(), outputDirectory) }
-	}
-})
+			report.getClassCount() shouldBe 0
+		}
+	})

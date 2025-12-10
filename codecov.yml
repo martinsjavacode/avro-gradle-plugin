@@ -1,0 +1,20 @@
+coverage:
+  status:
+    project:
+      default:
+        target: 90%
+        threshold: 1%
+    patch:
+      default:
+        target: 90%
+        threshold: 1%
+
+comment:
+  layout: "reach,diff,flags,tree"
+  behavior: default
+  require_changes: false
+
+ignore:
+  - "src/test/**/*"
+  - "build/**/*"
+  - "**/*Test.kt"
