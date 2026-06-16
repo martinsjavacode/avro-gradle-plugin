@@ -1,3 +1,15 @@
+## v2.0.0 (2026-06-16)
+
+### BREAKING CHANGE
+
+- The avro {} DSL now uses Property<T>. Replace direct assignment (sourceDir = "...") with sourceDir.set("...").
+
+### Refactor
+
+- mark DSL breaking change for major version bump
+- improve plugin architecture and add .avdl support
+- fix multiple issues in plugin architecture
+
 ## v1.2.0 (2025-12-10)
 
 ### Feat
