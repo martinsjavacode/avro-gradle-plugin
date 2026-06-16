@@ -11,7 +11,7 @@
 
 
 
-The **Avro Gradle Plugin** simplifies the process of generating Java classes from Avro schema files (`*.avsc`). With a focus on flexibility and ease of use, this plugin integrates seamlessly into the Gradle build process, offering extensive customization options for developers.
+The **Avro Gradle Plugin** simplifies the process of generating Java classes from Avro schema files. With a focus on flexibility and ease of use, this plugin integrates seamlessly into the Gradle build process, offering extensive customization options for developers.
 
 ---
 
@@ -20,8 +20,8 @@ The **Avro Gradle Plugin** simplifies the process of generating Java classes fro
 - [Requirements](#requirements)
 - [Configuration Options](#configuration-options)
 - [Usage Example](#usage-example)
+- [Migration from 1.x](#migration-from-1x)
 - [Contributing](#contributing)
-- [Authors](#authors)
 - [Issues](#issues)
 - [License](#license)
 
@@ -29,7 +29,8 @@ The **Avro Gradle Plugin** simplifies the process of generating Java classes fro
 
 ## **Features**
 - **Automatic Java Class Generation**: Generate Java classes directly from Avro schema files.
-- **Multiple Schema Formats**: Support for `.avsc` (JSON) and `.avpr` (Protocol) files.
+- **Multiple Schema Formats**: Support for `.avsc` (JSON), `.avpr` (Protocol), and `.avdl` (Avro IDL) files.
+- **Configuration Cache Compatible**: Fully compatible with Gradle's configuration cache.
 - **Incremental Build Cache**: Gradle build cache support for faster incremental builds.
 - **Schema Validation**: Dedicated task to validate schemas before generation.
 - **HTML Reports**: Automatic generation of detailed HTML reports with build statistics.
@@ -40,10 +41,9 @@ The **Avro Gradle Plugin** simplifies the process of generating Java classes fro
 - **Null-Safe Annotations**: Optionally add null-safe annotations to generated classes.
 - **Decimal Logical Type Support**: Enable support for decimal logical types in Avro schemas.
 - **Enhanced Error Handling**: Detailed error messages with file-specific context.
-- **Gradle Integration**: Fully integrates with both Kotlin DSL and Groovy DSL.
-- **Multiple Schema File Support**: Process multiple Avro schema files effortlessly.
+- **Lazy Configuration**: Uses Gradle's `Property<T>` API for optimal performance.
 - **Automatic Task Creation**: Automatically adds tasks to your Gradle workflow.
-- **Simple Configuration**: Intuitive configuration options for quick setup.
+
 ---
 
 ## **Requirements**
@@ -53,12 +53,13 @@ The **Avro Gradle Plugin** simplifies the process of generating Java classes fro
 
 ---
 
-**Configuration Options**
-Define configuration options in the `avro` block within your project's `build.gradle` or `build.gradle.kts` file. The following options are supported:
+## **Configuration Options**
+
+Define configuration options in the `avro` block within your project's `build.gradle.kts` file. All options use Gradle's `Property<T>` API:
 
 | **Option**                | **Description**                                                                     | **Default Value**            | **Allowed Values**           |
 |---------------------------|-------------------------------------------------------------------------------------|-----------------------------|-----------------------------|
-| `sourceDir`               | Directory containing Avro schema files (`*.avsc`, `*.avpr`).                        | `src/main/resources/avro`   | Custom directory path       |
+| `sourceDir`               | Directory containing Avro schema files (`*.avsc`, `*.avpr`, `*.avdl`).              | `src/main/resources/avro`   | Custom directory path       |
 | `outputDir`               | Directory to save generated Java classes (relative to build dir).                   | `generated/java`            | Custom directory path       |
 | `fieldVisibility`         | Visibility of generated fields.                                                     | `PUBLIC`                    | `PUBLIC`, `PRIVATE`         |
 | `stringType`              | String representation to use in generated classes.                                  | `String`                    | `String`, `CharSequence`, `Utf8` |
@@ -71,31 +72,60 @@ Define configuration options in the `avro` block within your project's `build.gr
 
 ## **Usage Example**
 
-Add the plugin to your `build.gradle` or `build.gradle.kts` file:
+Add the plugin to your `build.gradle.kts` file:
 
 ```kotlin
 plugins {
-    id("io.github.martinsjavacode.avro-gradle-plugin") version "1.0.0"
+    id("io.github.martinsjavacode.avro-gradle-plugin") version "2.0.0"
 }
 
 avro {
-    sourceDir = "src/main/avro"
-    outputDir = "generated-sources/avro"
-    fieldVisibility = "PRIVATE"
-    stringType = "CharSequence"
-    optionalGetters = true
+    sourceDir.set("src/main/avro")
+    outputDir.set("generated-sources/avro")
+    fieldVisibility.set("PRIVATE")
+    stringType.set("CharSequence")
+    optionalGetters.set(true)
 }
 ```
 
 Run the task to generate Avro classes:
 ```bash
-  ./gradlew generateAvroClasses
+./gradlew generateAvroClasses
+```
+
+Or validate schemas only:
+```bash
+./gradlew validateAvroSchemas
 ```
 
 Or build the project to include Avro generation:
 ```bash
-  ./gradlew build
+./gradlew build
 ```
+
+---
+
+## **Migration from 1.x**
+
+Version 2.0.0 introduces breaking changes in the DSL syntax. The `avro {}` block now uses Gradle's `Property<T>` API:
+
+```kotlin
+// Before (1.x)
+avro {
+    sourceDir = "src/main/avro"
+    fieldVisibility = "PRIVATE"
+    optionalGetters = true
+}
+
+// After (2.x)
+avro {
+    sourceDir.set("src/main/avro")
+    fieldVisibility.set("PRIVATE")
+    optionalGetters.set(true)
+}
+```
+
+This change enables full compatibility with Gradle's configuration cache and lazy task configuration.
 
 ---
 
