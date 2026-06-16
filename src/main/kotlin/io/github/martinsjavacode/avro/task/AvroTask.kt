@@ -5,88 +5,66 @@ import io.github.martinsjavacode.avro.generator.AvroGenerator
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.FileTree
-import org.gradle.api.tasks.CacheableTask
-import org.gradle.api.tasks.InputFiles
-import org.gradle.api.tasks.OutputDirectory
-import org.gradle.api.tasks.PathSensitive
-import org.gradle.api.tasks.PathSensitivity
-import org.gradle.api.tasks.TaskAction
-import java.io.File
-import java.util.*
+import org.gradle.api.provider.Property
+import org.gradle.api.tasks.*
 
 @CacheableTask
 abstract class AvroTask : DefaultTask() {
-	private var extension: AvroPluginExtension = project.extensions.getByType(AvroPluginExtension::class.java)
+	@get:Input
+	abstract val fieldVisibility: Property<String>
 
-	@get:InputFiles
+	@get:Input
+	abstract val stringType: Property<String>
+
+	@get:Input
+	abstract val optionalGetters: Property<Boolean>
+
+	@get:Input
+	abstract val useDecimalLogical: Property<Boolean>
+
+	@get:Input
+	abstract val createNullSafeAnnotations: Property<Boolean>
+
+	@get:InputDirectory
 	@get:PathSensitive(PathSensitivity.RELATIVE)
-	val schemaFiles: FileTree
-		get() {
-			val sourceDirectory =
-				extension.sourceDir?.let { project.file(it) }
-					?: project.file("src/main/resources/avro")
-			val finalSourceDir = resolveCustomSourceDir(sourceDirectory)
-			return project.fileTree(finalSourceDir) {
-				include("**/*.avsc", "**/*.avpr")
-			}
-		}
+	abstract val sourceDir: DirectoryProperty
 
 	@get:OutputDirectory
 	abstract val outputDir: DirectoryProperty
 
-	init {
-		outputDir.convention(
-			project.layout.buildDirectory.dir(
-				extension.outputDir ?: "generated/java",
-			),
-		)
-	}
+	@get:InputFiles
+	@get:PathSensitive(PathSensitivity.RELATIVE)
+	val schemaFiles: FileTree
+		get() = sourceDir.asFileTree.matching { include("**/*.avsc", "**/*.avpr") }
 
 	@TaskAction
 	fun generateAvroClasses() {
-		val sourceDirectory =
-			extension.sourceDir?.let { project.file(it) }
-				?: project.file("src/main/resources/avro")
-		val outputDirectory = outputDir.get().asFile
+		val source = sourceDir.get().asFile
+		val output = outputDir.get().asFile
+		output.mkdirs()
 
-		outputDirectory.mkdirs()
-
-		val finalSourceDir = resolveCustomSourceDir(sourceDirectory)
-
-		if (!finalSourceDir.exists()) {
-			project.logger.lifecycle("Source directory does not exist: $finalSourceDir")
+		if (!source.exists()) {
+			logger.lifecycle("Source directory does not exist: $source")
 			return
 		}
 
-		AvroGenerator.process(
-			sourceDir = finalSourceDir,
-			project = project,
-			extension = extension,
-			outputDirectory = outputDirectory,
-		)
-
-		project.logger.lifecycle("Avro classes generated successfully")
-	}
-
-	private fun resolveCustomSourceDir(defaultSourceDir: File): File {
-		val propertyFile = project.file("application.properties")
-		val yamlFile = project.file("application.yml")
-
-		val customSourceDir =
-			when {
-				propertyFile.exists() -> {
-					Properties().apply { load(propertyFile.inputStream()) }
-						.getProperty("sourceDirectory")
-				}
-
-				yamlFile.exists() -> {
-					Properties().apply { load(yamlFile.inputStream()) }
-						.getProperty("sourceDirectory")
-				}
-
-				else -> null
+		val extension =
+			AvroPluginExtension().apply {
+				fieldVisibility = this@AvroTask.fieldVisibility.get()
+				stringType = this@AvroTask.stringType.get()
+				optionalGetters = this@AvroTask.optionalGetters.get()
+				useDecimalLogical = this@AvroTask.useDecimalLogical.get()
+				createNullSafeAnnotations = this@AvroTask.createNullSafeAnnotations.get()
 			}
 
-		return customSourceDir?.let { project.file(it) } ?: defaultSourceDir
+		AvroGenerator.process(
+			sourceDir = source,
+			outputDirectory = output,
+			extension = extension,
+			reportDir = project.layout.buildDirectory.dir("reports/avro").get().asFile,
+			logger = logger,
+		)
+
+		logger.lifecycle("Avro classes generated successfully")
 	}
 }

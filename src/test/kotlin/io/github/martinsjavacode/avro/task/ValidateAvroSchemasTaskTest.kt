@@ -1,6 +1,5 @@
 package io.github.martinsjavacode.avro.task
 
-import io.github.martinsjavacode.avro.extension.AvroPluginExtension
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import org.gradle.testfixtures.ProjectBuilder
@@ -12,7 +11,6 @@ class ValidateAvroSchemasTaskTest :
 			val project = ProjectBuilder.builder().build()
 			project.pluginManager.apply("io.github.martinsjavacode.avro-gradle-plugin")
 
-			val extension = project.extensions.getByType(AvroPluginExtension::class.java)
 			val avroDir = File(project.projectDir, "src/main/resources/avro").apply { mkdirs() }
 
 			File(avroDir, "user.avsc").writeText(
@@ -29,9 +27,9 @@ class ValidateAvroSchemasTaskTest :
 				""".trimIndent(),
 			)
 
-			extension.sourceDir = avroDir.absolutePath
-
 			val task = project.tasks.getByName("validateAvroSchemas") as ValidateAvroSchemasTask
+			task.sourceDir.set(avroDir)
+			task.reportDir.set(File(project.layout.buildDirectory.get().asFile, "reports/avro-validation"))
 			task.validate()
 
 			avroDir.deleteRecursively()
@@ -41,7 +39,6 @@ class ValidateAvroSchemasTaskTest :
 			val project = ProjectBuilder.builder().build()
 			project.pluginManager.apply("io.github.martinsjavacode.avro-gradle-plugin")
 
-			val extension = project.extensions.getByType(AvroPluginExtension::class.java)
 			val avroDir = File(project.projectDir, "src/main/resources/avro").apply { mkdirs() }
 
 			File(avroDir, "empty.avsc").writeText(
@@ -55,9 +52,9 @@ class ValidateAvroSchemasTaskTest :
 				""".trimIndent(),
 			)
 
-			extension.sourceDir = avroDir.absolutePath
-
 			val task = project.tasks.getByName("validateAvroSchemas") as ValidateAvroSchemasTask
+			task.sourceDir.set(avroDir)
+			task.reportDir.set(File(project.layout.buildDirectory.get().asFile, "reports/avro-validation"))
 
 			shouldThrow<IllegalStateException> {
 				task.validate()
@@ -70,10 +67,11 @@ class ValidateAvroSchemasTaskTest :
 			val project = ProjectBuilder.builder().build()
 			project.pluginManager.apply("io.github.martinsjavacode.avro-gradle-plugin")
 
-			val extension = project.extensions.getByType(AvroPluginExtension::class.java)
-			extension.sourceDir = "/non/existent/path"
+			val nonExistent = File(project.projectDir, "non-existent")
 
 			val task = project.tasks.getByName("validateAvroSchemas") as ValidateAvroSchemasTask
+			task.sourceDir.set(nonExistent)
+			task.reportDir.set(File(project.layout.buildDirectory.get().asFile, "reports/avro-validation"))
 			task.validate()
 		}
 
@@ -81,7 +79,6 @@ class ValidateAvroSchemasTaskTest :
 			val project = ProjectBuilder.builder().build()
 			project.pluginManager.apply("io.github.martinsjavacode.avro-gradle-plugin")
 
-			val extension = project.extensions.getByType(AvroPluginExtension::class.java)
 			val avroDir = File(project.projectDir, "avro").apply { mkdirs() }
 
 			File(avroDir, "protocol.avpr").writeText(
@@ -100,9 +97,9 @@ class ValidateAvroSchemasTaskTest :
 				""".trimIndent(),
 			)
 
-			extension.sourceDir = avroDir.absolutePath
-
 			val task = project.tasks.getByName("validateAvroSchemas") as ValidateAvroSchemasTask
+			task.sourceDir.set(avroDir)
+			task.reportDir.set(File(project.layout.buildDirectory.get().asFile, "reports/avro-validation"))
 			task.validate()
 
 			avroDir.deleteRecursively()
@@ -112,7 +109,6 @@ class ValidateAvroSchemasTaskTest :
 			val project = ProjectBuilder.builder().build()
 			project.pluginManager.apply("io.github.martinsjavacode.avro-gradle-plugin")
 
-			val extension = project.extensions.getByType(AvroPluginExtension::class.java)
 			val avroDir = File(project.projectDir, "avro").apply { mkdirs() }
 
 			File(avroDir, "user.avsc").writeText(
@@ -135,9 +131,9 @@ class ValidateAvroSchemasTaskTest :
 				""".trimIndent(),
 			)
 
-			extension.sourceDir = avroDir.absolutePath
-
 			val task = project.tasks.getByName("validateAvroSchemas") as ValidateAvroSchemasTask
+			task.sourceDir.set(avroDir)
+			task.reportDir.set(File(project.layout.buildDirectory.get().asFile, "reports/avro-validation"))
 			task.validate()
 
 			avroDir.deleteRecursively()
@@ -147,7 +143,6 @@ class ValidateAvroSchemasTaskTest :
 			val project = ProjectBuilder.builder().build()
 			project.pluginManager.apply("io.github.martinsjavacode.avro-gradle-plugin")
 
-			val extension = project.extensions.getByType(AvroPluginExtension::class.java)
 			val avroDir = File(project.projectDir, "avro").apply { mkdirs() }
 
 			File(avroDir, "status.avsc").writeText(
@@ -161,9 +156,9 @@ class ValidateAvroSchemasTaskTest :
 				""".trimIndent(),
 			)
 
-			extension.sourceDir = avroDir.absolutePath
-
 			val task = project.tasks.getByName("validateAvroSchemas") as ValidateAvroSchemasTask
+			task.sourceDir.set(avroDir)
+			task.reportDir.set(File(project.layout.buildDirectory.get().asFile, "reports/avro-validation"))
 			task.validate()
 
 			avroDir.deleteRecursively()

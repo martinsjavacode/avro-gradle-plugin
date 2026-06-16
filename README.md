@@ -59,20 +59,13 @@ Define configuration options in the `avro` block within your project's `build.gr
 | **Option**                | **Description**                                                                     | **Default Value**            | **Allowed Values**           |
 |---------------------------|-------------------------------------------------------------------------------------|-----------------------------|-----------------------------|
 | `sourceDir`               | Directory containing Avro schema files (`*.avsc`, `*.avpr`).                        | `src/main/resources/avro`   | Custom directory path       |
-| `outputDir`               | Directory to save generated Java classes.                                           | `build/generated/java`      | Custom directory path       |
+| `outputDir`               | Directory to save generated Java classes (relative to build dir).                   | `generated/java`            | Custom directory path       |
 | `fieldVisibility`         | Visibility of generated fields.                                                     | `PUBLIC`                    | `PUBLIC`, `PRIVATE`         |
 | `stringType`              | String representation to use in generated classes.                                  | `String`                    | `String`, `CharSequence`, `Utf8` |
 | `optionalGetters`         | Enables optional getter methods for generated fields.                               | `false`                     | `true`, `false`             |
 | `useDecimalLogical`       | Enables support for decimal logical types in Avro schemas.                          | `false`                     | `true`, `false`             |
 | `createNullSafeAnnotations` | Adds null-safe annotations to generated classes.                                   | `false`                     | `true`, `false`             |
-| `enableCache`             | Enables Gradle build cache for incremental builds.                                  | `true`                      | `true`, `false`             |
 | `validateBeforeGenerate`  | Validates schemas before generation.                                                | `true`                      | `true`, `false`             |
-| `generateBuilders`        | Generates builder pattern classes (coming soon).                                    | `false`                     | `true`, `false`             |
-| `addCustomHeader`         | Adds custom header to generated files (coming soon).                                | `null`                      | Any string value            |
-| `stringType`              | String representation to use in generated classes.                                  | `String`                    | `String`, `CharSequence`, `Utf8` |
-| `optionalGetters`         | Enables optional getter methods for generated fields.                               | `false`                     | `true`, `false`             |
-| `useDecimalLogical`       | Enables support for decimal logical types in Avro schemas.                          | `false`                     | `true`, `false`             |
-| `createNullSafeAnnotations` | Adds null-safe annotations to generated classes.                                   | `false`                     | `true`, `false`             |
 
 ---
 
@@ -86,10 +79,8 @@ plugins {
 }
 
 avro {
-    group = "build"
-    description = "Plugin to generate Avro classes from schema files in the project"
     sourceDir = "src/main/avro"
-    outputDir = "build/generated-sources/avro"
+    outputDir = "generated-sources/avro"
     fieldVisibility = "PRIVATE"
     stringType = "CharSequence"
     optionalGetters = true
@@ -124,22 +115,6 @@ Contributions are welcome! To contribute:
     git push origin feature/new-feature
     ```
 5. Open a Pull Request on GitHub.
-
----
-
-## Authors
-<div style="display: flex; width: 100%; border: 1px solid #ddd; border-radius: 10px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); font-family: Arial, sans-serif; background: #333; overflow: hidden;">
-  <img src="https://avatars.githubusercontent.com/u/8130295?v=4" alt="Martins Photo" style="height: 200px; object-fit: contain;">
-  <div style="padding: 0 20px; text-align: left; flex: 1;">
-    <h2 style="font-size: 1.5em; color: #fff;">Alexandre Martins</h2>
-    <p style="font-size: 0.9em; color: #fff; margin-bottom: 15px;">Software Engineer with a strong passion for Java and building efficient, scalable solutions. Experienced in various tools and technologies, with a focus on delivering clean, high-quality code and driving innovation.</p>
-    <div style="display: inline-block; padding: 6px 10px; background: #007bff; color: #fff; text-decoration: none; border-radius: 5px; transition: background 0.3s ease;">
-        amartins.alexandre@hotmail.com
-    </div>
-  </div>
-</div>
-
-
 
 ---
 

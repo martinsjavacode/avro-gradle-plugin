@@ -90,9 +90,10 @@ class AvroGeneratorTest :
 			val report =
 				AvroGenerator.process(
 					sourceDir = sourceDirectory,
-					project = project,
 					extension = extension,
 					outputDirectory = outputDirectory,
+					reportDir = buildDir,
+					logger = project.logger,
 				)
 
 			report.getClassCount() shouldBe 1
@@ -109,9 +110,10 @@ class AvroGeneratorTest :
 			try {
 				AvroGenerator.process(
 					sourceDir = sourceDirectory,
-					project = project,
 					extension = extension,
 					outputDirectory = outputDirectory,
+					reportDir = buildDir,
+					logger = project.logger,
 				)
 			} catch (e: IllegalStateException) {
 				exceptionThrown = true
@@ -127,9 +129,10 @@ class AvroGeneratorTest :
 			val report =
 				AvroGenerator.process(
 					sourceDir = sourceDirectory,
-					project = project,
 					extension = extension,
 					outputDirectory = outputDirectory,
+					reportDir = buildDir,
+					logger = project.logger,
 				)
 
 			report.getClassCount() shouldBe 0

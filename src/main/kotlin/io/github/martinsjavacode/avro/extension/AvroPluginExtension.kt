@@ -8,11 +8,5 @@ open class AvroPluginExtension {
 	var optionalGetters: Boolean = false
 	var useDecimalLogical: Boolean = false
 	var createNullSafeAnnotations: Boolean = false
-	
-	// Novas opções
-	var enableCache: Boolean = true
 	var validateBeforeGenerate: Boolean = true
-	var generateBuilders: Boolean = false
-	var addCustomHeader: String? = null
-	var logicalTypeConversions: Map<String, String> = emptyMap()
 }

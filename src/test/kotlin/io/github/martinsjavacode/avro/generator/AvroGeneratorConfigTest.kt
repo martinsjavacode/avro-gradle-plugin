@@ -67,9 +67,10 @@ class AvroGeneratorConfigTest :
 			val report =
 				AvroGenerator.process(
 					sourceDir = sourceDirectory,
-					project = project,
 					extension = extension,
 					outputDirectory = outputDirectory,
+					reportDir = buildDir,
+					logger = project.logger,
 				)
 
 			report.getClassCount() shouldBe 1
@@ -95,14 +96,10 @@ class AvroGeneratorConfigTest :
 				}
 
 			val logger = mockk<Logger>(relaxed = true)
-			val project =
-				mockk<Project>(relaxed = true) {
-					every { this@mockk.logger } returns logger
-					every { layout.buildDirectory.asFile.get() } throws RuntimeException("Build dir not available")
-				}
 
 			val sourceDirectory = createTempDirectory("sourceDir").toFile()
 			val outputDirectory = createTempDirectory("outputDir").toFile()
+			val invalidReportDir = File("/dev/null/impossible-path")
 
 			File(sourceDirectory, "simple.avsc").writeText(
 				"""
@@ -137,9 +134,10 @@ class AvroGeneratorConfigTest :
 			val report =
 				AvroGenerator.process(
 					sourceDir = sourceDirectory,
-					project = project,
 					extension = extension,
 					outputDirectory = outputDirectory,
+					reportDir = invalidReportDir,
+					logger = logger,
 				)
 
 			report.getClassCount() shouldBe 1
@@ -225,9 +223,10 @@ class AvroGeneratorConfigTest :
 			val report =
 				AvroGenerator.process(
 					sourceDir = sourceDirectory,
-					project = project,
 					extension = extension,
 					outputDirectory = outputDirectory,
+					reportDir = buildDir,
+					logger = project.logger,
 				)
 
 			report.getClassCount() shouldBe 2

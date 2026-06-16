@@ -2,9 +2,7 @@ package io.github.martinsjavacode.avro.validator
 
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
-import io.mockk.every
 import io.mockk.mockk
-import org.gradle.api.Project
 import org.gradle.api.logging.Logger
 import java.io.File
 import kotlin.io.path.createTempDirectory
@@ -12,11 +10,9 @@ import kotlin.io.path.createTempDirectory
 class ValidationEdgeCasesTest :
 	StringSpec({
 		"should validate complex nested structures" {
-			val project = mockk<Project>()
 			val logger = mockk<Logger>(relaxed = true)
-			every { project.logger } returns logger
 
-			val validator = SchemaValidator(project)
+			val validator = SchemaValidator(logger)
 			val tempDir = createTempDirectory("test").toFile()
 
 			File(tempDir, "complex.avsc").writeText(
@@ -72,11 +68,9 @@ class ValidationEdgeCasesTest :
 		}
 
 		"should detect blank field names" {
-			val project = mockk<Project>()
 			val logger = mockk<Logger>(relaxed = true)
-			every { project.logger } returns logger
 
-			val validator = SchemaValidator(project)
+			val validator = SchemaValidator(logger)
 			val tempDir = createTempDirectory("test").toFile()
 
 			File(tempDir, "blank-field.avsc").writeText(
@@ -100,11 +94,9 @@ class ValidationEdgeCasesTest :
 		}
 
 		"should validate empty union types" {
-			val project = mockk<Project>()
 			val logger = mockk<Logger>(relaxed = true)
-			every { project.logger } returns logger
 
-			val validator = SchemaValidator(project)
+			val validator = SchemaValidator(logger)
 			val tempDir = createTempDirectory("test").toFile()
 
 			// Union vazia não é um JSON válido, vou usar um caso mais realista
@@ -132,11 +124,9 @@ class ValidationEdgeCasesTest :
 		}
 
 		"should handle primitive types" {
-			val project = mockk<Project>()
 			val logger = mockk<Logger>(relaxed = true)
-			every { project.logger } returns logger
 
-			val validator = SchemaValidator(project)
+			val validator = SchemaValidator(logger)
 			val tempDir = createTempDirectory("test").toFile()
 
 			File(tempDir, "primitives.avsc").writeText(
@@ -167,11 +157,9 @@ class ValidationEdgeCasesTest :
 		}
 
 		"should validate fixed types" {
-			val project = mockk<Project>()
 			val logger = mockk<Logger>(relaxed = true)
-			every { project.logger } returns logger
 
-			val validator = SchemaValidator(project)
+			val validator = SchemaValidator(logger)
 			val tempDir = createTempDirectory("test").toFile()
 
 			File(tempDir, "fixed.avsc").writeText(
@@ -203,11 +191,9 @@ class ValidationEdgeCasesTest :
 		}
 
 		"should handle mixed file types" {
-			val project = mockk<Project>()
 			val logger = mockk<Logger>(relaxed = true)
-			every { project.logger } returns logger
 
-			val validator = SchemaValidator(project)
+			val validator = SchemaValidator(logger)
 			val tempDir = createTempDirectory("test").toFile()
 
 			File(tempDir, "record.avsc").writeText(

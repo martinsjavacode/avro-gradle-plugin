@@ -1,6 +1,5 @@
 package io.github.martinsjavacode.avro.task
 
-import io.github.martinsjavacode.avro.extension.AvroPluginExtension
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
@@ -13,7 +12,6 @@ class TaskConfigurationTest :
 			val project = ProjectBuilder.builder().build()
 			project.pluginManager.apply("io.github.martinsjavacode.avro-gradle-plugin")
 
-			val extension = project.extensions.getByType(AvroPluginExtension::class.java)
 			val avroDir = File(project.projectDir, "custom/avro").apply { mkdirs() }
 
 			File(avroDir, "test.avsc").writeText(
@@ -26,9 +24,8 @@ class TaskConfigurationTest :
 				""".trimIndent(),
 			)
 
-			extension.sourceDir = avroDir.absolutePath
-
 			val task = project.tasks.getByName("generateAvroClasses") as AvroTask
+			task.sourceDir.set(avroDir)
 			val schemaFiles = task.schemaFiles
 
 			schemaFiles shouldNotBe null
@@ -41,7 +38,6 @@ class TaskConfigurationTest :
 			val project = ProjectBuilder.builder().build()
 			project.pluginManager.apply("io.github.martinsjavacode.avro-gradle-plugin")
 
-			val extension = project.extensions.getByType(AvroPluginExtension::class.java)
 			val avroDir = File(project.projectDir, "props-avro").apply { mkdirs() }
 
 			File(project.projectDir, "application.properties").writeText(
@@ -58,9 +54,14 @@ class TaskConfigurationTest :
 				""".trimIndent(),
 			)
 
-			extension.validateBeforeGenerate = false
-
 			val task = project.tasks.getByName("generateAvroClasses") as AvroTask
+			task.sourceDir.set(avroDir)
+			task.outputDir.set(File(project.layout.buildDirectory.get().asFile, "generated/java"))
+			task.fieldVisibility.set("PUBLIC")
+			task.stringType.set("String")
+			task.optionalGetters.set(false)
+			task.useDecimalLogical.set(false)
+			task.createNullSafeAnnotations.set(false)
 			task.generateAvroClasses()
 
 			File(project.projectDir, "application.properties").delete()
@@ -71,7 +72,6 @@ class TaskConfigurationTest :
 			val project = ProjectBuilder.builder().build()
 			project.pluginManager.apply("io.github.martinsjavacode.avro-gradle-plugin")
 
-			val extension = project.extensions.getByType(AvroPluginExtension::class.java)
 			val avroDir = File(project.projectDir, "yaml-avro").apply { mkdirs() }
 
 			File(project.projectDir, "application.yml").writeText(
@@ -88,9 +88,14 @@ class TaskConfigurationTest :
 				""".trimIndent(),
 			)
 
-			extension.validateBeforeGenerate = false
-
 			val task = project.tasks.getByName("generateAvroClasses") as AvroTask
+			task.sourceDir.set(avroDir)
+			task.outputDir.set(File(project.layout.buildDirectory.get().asFile, "generated/java"))
+			task.fieldVisibility.set("PUBLIC")
+			task.stringType.set("String")
+			task.optionalGetters.set(false)
+			task.useDecimalLogical.set(false)
+			task.createNullSafeAnnotations.set(false)
 			task.generateAvroClasses()
 
 			File(project.projectDir, "application.yml").delete()
@@ -101,31 +106,35 @@ class TaskConfigurationTest :
 			val project = ProjectBuilder.builder().build()
 			project.pluginManager.apply("io.github.martinsjavacode.avro-gradle-plugin")
 
-			val extension = project.extensions.getByType(AvroPluginExtension::class.java)
-			extension.validateBeforeGenerate = false
+			val defaultDir = File(project.projectDir, "src/main/resources/avro").apply { mkdirs() }
 
 			val task = project.tasks.getByName("generateAvroClasses") as AvroTask
+			task.sourceDir.set(defaultDir)
+			task.outputDir.set(File(project.layout.buildDirectory.get().asFile, "generated/java"))
+			task.fieldVisibility.set("PUBLIC")
+			task.stringType.set("String")
+			task.optionalGetters.set(false)
+			task.useDecimalLogical.set(false)
+			task.createNullSafeAnnotations.set(false)
 			task.generateAvroClasses()
+
+			defaultDir.deleteRecursively()
 		}
 
 		"should configure outputDir property" {
 			val project = ProjectBuilder.builder().build()
 			project.pluginManager.apply("io.github.martinsjavacode.avro-gradle-plugin")
 
-			val extension = project.extensions.getByType(AvroPluginExtension::class.java)
-			extension.outputDir = "custom/output"
-
 			val task = project.tasks.getByName("generateAvroClasses") as AvroTask
-			val outputDir = task.outputDir
+			task.outputDir.set(File(project.projectDir, "custom/output"))
 
-			outputDir shouldNotBe null
+			task.outputDir shouldNotBe null
 		}
 
 		"should validate with custom source directory" {
 			val project = ProjectBuilder.builder().build()
 			project.pluginManager.apply("io.github.martinsjavacode.avro-gradle-plugin")
 
-			val extension = project.extensions.getByType(AvroPluginExtension::class.java)
 			val avroDir = File(project.projectDir, "validate-dir").apply { mkdirs() }
 
 			File(avroDir, "validate.avsc").writeText(
@@ -138,9 +147,8 @@ class TaskConfigurationTest :
 				""".trimIndent(),
 			)
 
-			extension.sourceDir = avroDir.absolutePath
-
 			val validateTask = project.tasks.getByName("validateAvroSchemas") as ValidateAvroSchemasTask
+			validateTask.sourceDir.set(avroDir)
 			val schemaFiles = validateTask.schemaFiles
 
 			schemaFiles shouldNotBe null

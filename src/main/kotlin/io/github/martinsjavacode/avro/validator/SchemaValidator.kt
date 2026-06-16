@@ -2,10 +2,10 @@ package io.github.martinsjavacode.avro.validator
 
 import org.apache.avro.Protocol
 import org.apache.avro.Schema
-import org.gradle.api.Project
+import org.gradle.api.logging.Logger
 import java.io.File
 
-class SchemaValidator(private val project: Project) {
+class SchemaValidator(private val logger: Logger) {
 	fun validate(sourceDir: File): ValidationResult {
 		val errors = mutableListOf<String>()
 		var validatedCount = 0
@@ -19,7 +19,7 @@ class SchemaValidator(private val project: Project) {
 						"avpr" -> validateAvpr(file)
 					}
 					validatedCount++
-					project.logger.lifecycle("✓ ${file.name}")
+					logger.lifecycle("✓ ${file.name}")
 				} catch (e: Exception) {
 					errors.add("${file.name}: ${e.message}")
 				}

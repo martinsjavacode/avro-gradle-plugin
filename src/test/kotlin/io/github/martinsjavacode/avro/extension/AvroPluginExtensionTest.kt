@@ -15,11 +15,7 @@ class AvroPluginExtensionTest :
 			extension.optionalGetters shouldBe false
 			extension.useDecimalLogical shouldBe false
 			extension.createNullSafeAnnotations shouldBe false
-			extension.enableCache shouldBe true
 			extension.validateBeforeGenerate shouldBe true
-			extension.generateBuilders shouldBe false
-			extension.addCustomHeader shouldBe null
-			extension.logicalTypeConversions shouldBe emptyMap()
 		}
 
 		"should allow setting custom values" {
@@ -32,7 +28,6 @@ class AvroPluginExtensionTest :
 			extension.optionalGetters = true
 			extension.useDecimalLogical = true
 			extension.createNullSafeAnnotations = true
-			extension.enableCache = false
 			extension.validateBeforeGenerate = false
 
 			extension.sourceDir shouldBe "custom/source"
@@ -42,7 +37,6 @@ class AvroPluginExtensionTest :
 			extension.optionalGetters shouldBe true
 			extension.useDecimalLogical shouldBe true
 			extension.createNullSafeAnnotations shouldBe true
-			extension.enableCache shouldBe false
 			extension.validateBeforeGenerate shouldBe false
 		}
 
