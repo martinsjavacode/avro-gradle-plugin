@@ -52,16 +52,24 @@ jobs:
     outputs:
       version: ${{ env.REVISION }}
     steps:
+      - name: Generate GitHub App Token
+        id: app-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
       - name: Checkout code
         uses: actions/checkout@v6
         with:
           fetch-tags: 'true'
           fetch-depth: 0
+          token: ${{ steps.app-token.outputs.token }}
 
       - name: Create bump and changelog
         uses: commitizen-tools/commitizen-action@master
         with:
-          github_token: ${{ secrets.PAT_AVRO_TOKEN }}
+          github_token: ${{ steps.app-token.outputs.token }}
 
   publish:
     runs-on: ubuntu-latest
