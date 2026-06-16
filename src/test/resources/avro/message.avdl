@@ -1,0 +1,8 @@
+@namespace("io.github.martinsjavacode.avro")
+protocol MessageProtocol {
+  record Message {
+    string id;
+    string content;
+    long timestamp;
+  }
+}

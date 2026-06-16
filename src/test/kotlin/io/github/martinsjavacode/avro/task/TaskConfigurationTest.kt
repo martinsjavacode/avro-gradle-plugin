@@ -62,6 +62,7 @@ class TaskConfigurationTest :
 			task.optionalGetters.set(false)
 			task.useDecimalLogical.set(false)
 			task.createNullSafeAnnotations.set(false)
+			task.reportDir.set(File(project.layout.buildDirectory.get().asFile, "reports/avro"))
 			task.generateAvroClasses()
 
 			File(project.projectDir, "application.properties").delete()
@@ -96,6 +97,7 @@ class TaskConfigurationTest :
 			task.optionalGetters.set(false)
 			task.useDecimalLogical.set(false)
 			task.createNullSafeAnnotations.set(false)
+			task.reportDir.set(File(project.layout.buildDirectory.get().asFile, "reports/avro"))
 			task.generateAvroClasses()
 
 			File(project.projectDir, "application.yml").delete()
@@ -116,6 +118,7 @@ class TaskConfigurationTest :
 			task.optionalGetters.set(false)
 			task.useDecimalLogical.set(false)
 			task.createNullSafeAnnotations.set(false)
+			task.reportDir.set(File(project.layout.buildDirectory.get().asFile, "reports/avro"))
 			task.generateAvroClasses()
 
 			defaultDir.deleteRecursively()

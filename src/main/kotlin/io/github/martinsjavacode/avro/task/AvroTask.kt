@@ -1,7 +1,7 @@
 package io.github.martinsjavacode.avro.task
 
-import io.github.martinsjavacode.avro.extension.AvroPluginExtension
 import io.github.martinsjavacode.avro.generator.AvroGenerator
+import io.github.martinsjavacode.avro.generator.AvroGeneratorConfig
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.FileTree
@@ -32,10 +32,13 @@ abstract class AvroTask : DefaultTask() {
 	@get:OutputDirectory
 	abstract val outputDir: DirectoryProperty
 
+	@get:Internal
+	abstract val reportDir: DirectoryProperty
+
 	@get:InputFiles
 	@get:PathSensitive(PathSensitivity.RELATIVE)
 	val schemaFiles: FileTree
-		get() = sourceDir.asFileTree.matching { include("**/*.avsc", "**/*.avpr") }
+		get() = sourceDir.asFileTree.matching { include("**/*.avsc", "**/*.avpr", "**/*.avdl") }
 
 	@TaskAction
 	fun generateAvroClasses() {
@@ -48,20 +51,20 @@ abstract class AvroTask : DefaultTask() {
 			return
 		}
 
-		val extension =
-			AvroPluginExtension().apply {
-				fieldVisibility = this@AvroTask.fieldVisibility.get()
-				stringType = this@AvroTask.stringType.get()
-				optionalGetters = this@AvroTask.optionalGetters.get()
-				useDecimalLogical = this@AvroTask.useDecimalLogical.get()
-				createNullSafeAnnotations = this@AvroTask.createNullSafeAnnotations.get()
-			}
+		val config =
+			AvroGeneratorConfig(
+				fieldVisibility = fieldVisibility.get(),
+				stringType = stringType.get(),
+				optionalGetters = optionalGetters.get(),
+				useDecimalLogical = useDecimalLogical.get(),
+				createNullSafeAnnotations = createNullSafeAnnotations.get(),
+			)
 
 		AvroGenerator.process(
 			sourceDir = source,
 			outputDirectory = output,
-			extension = extension,
-			reportDir = project.layout.buildDirectory.dir("reports/avro").get().asFile,
+			config = config,
+			reportDir = reportDir.get().asFile,
 			logger = logger,
 		)
 

@@ -306,4 +306,31 @@ class SchemaValidatorTest :
 
 			tempDir.deleteRecursively()
 		}
+
+		"should validate AVDL files" {
+			val logger = mockk<Logger>(relaxed = true)
+
+			val validator = SchemaValidator(logger)
+			val tempDir = createTempDirectory("test").toFile()
+
+			File(tempDir, "message.avdl").writeText(
+				"""
+				@namespace("com.example")
+				protocol MessageProtocol {
+				  record Message {
+				    string id;
+				    string content;
+				    long timestamp;
+				  }
+				}
+				""".trimIndent(),
+			)
+
+			val result = validator.validate(tempDir)
+
+			result.hasErrors() shouldBe false
+			result.validatedCount shouldBe 1
+
+			tempDir.deleteRecursively()
+		}
 	})

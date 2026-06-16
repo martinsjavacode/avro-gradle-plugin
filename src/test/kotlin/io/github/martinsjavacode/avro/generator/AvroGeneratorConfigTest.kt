@@ -1,6 +1,5 @@
 package io.github.martinsjavacode.avro.generator
 
-import io.github.martinsjavacode.avro.extension.AvroPluginExtension
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.*
@@ -14,14 +13,14 @@ import kotlin.io.path.createTempDirectory
 class AvroGeneratorConfigTest :
 	StringSpec({
 		"should apply all extension configurations" {
-			val extension =
-				mockk<AvroPluginExtension>(relaxed = true) {
-					every { fieldVisibility } returns "PRIVATE"
-					every { stringType } returns "CharSequence"
-					every { optionalGetters } returns true
-					every { createNullSafeAnnotations } returns true
-					every { useDecimalLogical } returns true
-				}
+			val config =
+				AvroGeneratorConfig(
+					fieldVisibility = "PRIVATE",
+					stringType = "CharSequence",
+					optionalGetters = true,
+					createNullSafeAnnotations = true,
+					useDecimalLogical = true,
+				)
 
 			val buildDir = createTempDirectory("build").toFile()
 			val logger = mockk<Logger>(relaxed = true)
@@ -67,7 +66,7 @@ class AvroGeneratorConfigTest :
 			val report =
 				AvroGenerator.process(
 					sourceDir = sourceDirectory,
-					extension = extension,
+					config = config,
 					outputDirectory = outputDirectory,
 					reportDir = buildDir,
 					logger = project.logger,
@@ -75,7 +74,6 @@ class AvroGeneratorConfigTest :
 
 			report.getClassCount() shouldBe 1
 
-			// Verificar se as configurações foram aplicadas
 			verify { anyConstructed<SpecificCompiler>().isCreateOptionalGetters = true }
 			verify { anyConstructed<SpecificCompiler>().isCreateSetters = false }
 			verify { anyConstructed<SpecificCompiler>().isCreateNullSafeAnnotations = true }
@@ -86,14 +84,14 @@ class AvroGeneratorConfigTest :
 		}
 
 		"should handle report generation failure gracefully" {
-			val extension =
-				mockk<AvroPluginExtension>(relaxed = true) {
-					every { fieldVisibility } returns "PUBLIC"
-					every { stringType } returns "String"
-					every { optionalGetters } returns false
-					every { createNullSafeAnnotations } returns false
-					every { useDecimalLogical } returns false
-				}
+			val config =
+				AvroGeneratorConfig(
+					fieldVisibility = "PUBLIC",
+					stringType = "String",
+					optionalGetters = false,
+					createNullSafeAnnotations = false,
+					useDecimalLogical = false,
+				)
 
 			val logger = mockk<Logger>(relaxed = true)
 
@@ -134,7 +132,7 @@ class AvroGeneratorConfigTest :
 			val report =
 				AvroGenerator.process(
 					sourceDir = sourceDirectory,
-					extension = extension,
+					config = config,
 					outputDirectory = outputDirectory,
 					reportDir = invalidReportDir,
 					logger = logger,
@@ -142,7 +140,6 @@ class AvroGeneratorConfigTest :
 
 			report.getClassCount() shouldBe 1
 
-			// Verificar que o warning foi logado
 			verify { logger.warn(match { it.contains("Could not generate HTML report") }) }
 
 			sourceDirectory.deleteRecursively()
@@ -150,14 +147,14 @@ class AvroGeneratorConfigTest :
 		}
 
 		"should handle different schema types in same directory" {
-			val extension =
-				mockk<AvroPluginExtension>(relaxed = true) {
-					every { fieldVisibility } returns "PUBLIC"
-					every { stringType } returns "String"
-					every { optionalGetters } returns false
-					every { createNullSafeAnnotations } returns false
-					every { useDecimalLogical } returns false
-				}
+			val config =
+				AvroGeneratorConfig(
+					fieldVisibility = "PUBLIC",
+					stringType = "String",
+					optionalGetters = false,
+					createNullSafeAnnotations = false,
+					useDecimalLogical = false,
+				)
 
 			val buildDir = createTempDirectory("build").toFile()
 			val logger = mockk<Logger>(relaxed = true)
@@ -170,7 +167,6 @@ class AvroGeneratorConfigTest :
 			val sourceDirectory = createTempDirectory("sourceDir").toFile()
 			val outputDirectory = createTempDirectory("outputDir").toFile()
 
-			// Criar diferentes tipos de schema
 			File(sourceDirectory, "record.avsc").writeText(
 				"""
 				{
@@ -223,7 +219,7 @@ class AvroGeneratorConfigTest :
 			val report =
 				AvroGenerator.process(
 					sourceDir = sourceDirectory,
-					extension = extension,
+					config = config,
 					outputDirectory = outputDirectory,
 					reportDir = buildDir,
 					logger = project.logger,

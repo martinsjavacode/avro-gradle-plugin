@@ -1,6 +1,5 @@
 package io.github.martinsjavacode.avro.generator
 
-import io.github.martinsjavacode.avro.extension.AvroPluginExtension
 import io.github.martinsjavacode.avro.report.GeneratedClass
 import io.github.martinsjavacode.avro.report.GenerationReport
 import org.apache.avro.Protocol
@@ -8,6 +7,7 @@ import org.apache.avro.Schema
 import org.apache.avro.compiler.specific.SpecificCompiler
 import org.apache.avro.compiler.specific.SpecificCompiler.FieldVisibility
 import org.apache.avro.generic.GenericData.StringType
+import org.apache.avro.idl.IdlReader
 import org.gradle.api.logging.Logger
 import java.io.File
 
@@ -15,7 +15,7 @@ object AvroGenerator {
 	fun process(
 		sourceDir: File,
 		outputDirectory: File,
-		extension: AvroPluginExtension,
+		config: AvroGeneratorConfig,
 		reportDir: File,
 		logger: Logger,
 	): GenerationReport {
@@ -25,7 +25,7 @@ object AvroGenerator {
 		sourceDir.walkTopDown()
 			.filter { dir -> dir.isDirectory && dir.walkTopDown().any { it.isFile } }
 			.forEach { subDir ->
-				generate(extension, subDir, outputDirectory, errors, report, logger)
+				generate(config, subDir, outputDirectory, errors, report, logger)
 			}
 
 		if (errors.isNotEmpty()) {
@@ -46,7 +46,7 @@ object AvroGenerator {
 	}
 
 	private fun generate(
-		extension: AvroPluginExtension,
+		config: AvroGeneratorConfig,
 		sourceDirectory: File,
 		outputDirectory: File,
 		errors: MutableList<String>,
@@ -54,12 +54,13 @@ object AvroGenerator {
 		logger: Logger,
 	) {
 		sourceDirectory.listFiles { file ->
-			file.extension in listOf("avsc", "avpr")
+			file.extension in listOf("avsc", "avpr", "avdl")
 		}?.forEach { file ->
 			try {
 				when (file.extension) {
-					"avsc" -> processAvsc(file, extension, outputDirectory, logger, report)
-					"avpr" -> processAvpr(file, extension, outputDirectory, logger, report)
+					"avsc" -> processAvsc(file, config, outputDirectory, logger, report)
+					"avpr" -> processAvpr(file, config, outputDirectory, logger, report)
+					"avdl" -> processAvdl(file, config, outputDirectory, logger, report)
 				}
 			} catch (e: Exception) {
 				val errorMsg = "Error processing ${file.name}: ${e.message}"
@@ -71,14 +72,14 @@ object AvroGenerator {
 
 	private fun processAvsc(
 		file: File,
-		extension: AvroPluginExtension,
+		config: AvroGeneratorConfig,
 		outputDirectory: File,
 		logger: Logger,
 		report: GenerationReport,
 	) {
 		val schema = Schema.Parser().parse(file)
 		validateSchema(schema)
-		val outputFile = compileSchema(schema, file, extension, outputDirectory)
+		val outputFile = compileSchema(schema, file, config, outputDirectory)
 		report.addClass(
 			GeneratedClass(
 				name = schema.name,
@@ -92,7 +93,7 @@ object AvroGenerator {
 
 	private fun processAvpr(
 		file: File,
-		extension: AvroPluginExtension,
+		config: AvroGeneratorConfig,
 		outputDirectory: File,
 		logger: Logger,
 		report: GenerationReport,
@@ -100,7 +101,7 @@ object AvroGenerator {
 		val protocol = Protocol.parse(file)
 		protocol.types.forEach { schema ->
 			validateSchema(schema)
-			val outputFile = compileSchema(schema, file, extension, outputDirectory)
+			val outputFile = compileSchema(schema, file, config, outputDirectory)
 			report.addClass(
 				GeneratedClass(
 					name = schema.name,
@@ -110,6 +111,31 @@ object AvroGenerator {
 				),
 			)
 			logger.lifecycle("Generated class from AVPR: ${schema.name}")
+		}
+	}
+
+	private fun processAvdl(
+		file: File,
+		config: AvroGeneratorConfig,
+		outputDirectory: File,
+		logger: Logger,
+		report: GenerationReport,
+	) {
+		val idlFile = IdlReader().parse(file.toPath())
+		val schemas = idlFile.namedSchemas.values
+
+		schemas.forEach { schema ->
+			validateSchema(schema)
+			val outputFile = compileSchema(schema, file, config, outputDirectory)
+			report.addClass(
+				GeneratedClass(
+					name = schema.name,
+					sourceFile = file.name,
+					outputFile = outputFile.relativeTo(outputDirectory).path,
+					type = "AVDL",
+				),
+			)
+			logger.lifecycle("Generated class from AVDL: ${schema.name}")
 		}
 	}
 
@@ -131,17 +157,17 @@ object AvroGenerator {
 	private fun compileSchema(
 		schema: Schema,
 		sourceFile: File,
-		extension: AvroPluginExtension,
+		config: AvroGeneratorConfig,
 		outputDirectory: File,
 	): File {
 		val compiler =
 			SpecificCompiler(schema).apply {
-				isCreateOptionalGetters = extension.optionalGetters
-				isCreateSetters = extension.fieldVisibility == "PUBLIC"
-				isCreateNullSafeAnnotations = extension.createNullSafeAnnotations
-				setFieldVisibility(FieldVisibility.valueOf(extension.fieldVisibility))
-				setStringType(StringType.valueOf(extension.stringType))
-				setEnableDecimalLogicalType(extension.useDecimalLogical)
+				isCreateOptionalGetters = config.optionalGetters
+				isCreateSetters = config.fieldVisibility == "PUBLIC"
+				isCreateNullSafeAnnotations = config.createNullSafeAnnotations
+				setFieldVisibility(FieldVisibility.valueOf(config.fieldVisibility))
+				setStringType(StringType.valueOf(config.stringType))
+				setEnableDecimalLogicalType(config.useDecimalLogical)
 			}
 
 		compiler.compileToDestination(sourceFile, outputDirectory)

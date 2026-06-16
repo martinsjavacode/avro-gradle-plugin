@@ -15,7 +15,7 @@ abstract class ValidateAvroSchemasTask : DefaultTask() {
 	@get:InputFiles
 	@get:PathSensitive(PathSensitivity.RELATIVE)
 	val schemaFiles: FileTree
-		get() = sourceDir.asFileTree.matching { include("**/*.avsc", "**/*.avpr") }
+		get() = sourceDir.asFileTree.matching { include("**/*.avsc", "**/*.avpr", "**/*.avdl") }
 
 	@get:OutputDirectory
 	abstract val reportDir: DirectoryProperty

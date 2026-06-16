@@ -1,6 +1,5 @@
 package io.github.martinsjavacode.avro.generator
 
-import io.github.martinsjavacode.avro.extension.AvroPluginExtension
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
@@ -15,14 +14,14 @@ import kotlin.io.path.createTempDirectory
 class AvroGeneratorErrorTest :
 	StringSpec({
 		"should handle AVPR with multiple types" {
-			val extension =
-				mockk<AvroPluginExtension>(relaxed = true) {
-					every { fieldVisibility } returns "PUBLIC"
-					every { stringType } returns "String"
-					every { optionalGetters } returns false
-					every { createNullSafeAnnotations } returns false
-					every { useDecimalLogical } returns false
-				}
+			val config =
+				AvroGeneratorConfig(
+					fieldVisibility = "PUBLIC",
+					stringType = "String",
+					optionalGetters = false,
+					createNullSafeAnnotations = false,
+					useDecimalLogical = false,
+				)
 
 			val buildDir = createTempDirectory("build").toFile()
 			val logger = mockk<Logger>(relaxed = true)
@@ -62,7 +61,7 @@ class AvroGeneratorErrorTest :
 			val report =
 				AvroGenerator.process(
 					sourceDir = sourceDirectory,
-					extension = extension,
+					config = config,
 					outputDirectory = outputDirectory,
 					reportDir = buildDir,
 					logger = project.logger,
@@ -76,14 +75,14 @@ class AvroGeneratorErrorTest :
 		}
 
 		"should validate enum with symbols" {
-			val extension =
-				mockk<AvroPluginExtension>(relaxed = true) {
-					every { fieldVisibility } returns "PUBLIC"
-					every { stringType } returns "String"
-					every { optionalGetters } returns false
-					every { createNullSafeAnnotations } returns false
-					every { useDecimalLogical } returns false
-				}
+			val config =
+				AvroGeneratorConfig(
+					fieldVisibility = "PUBLIC",
+					stringType = "String",
+					optionalGetters = false,
+					createNullSafeAnnotations = false,
+					useDecimalLogical = false,
+				)
 
 			val buildDir = createTempDirectory("build").toFile()
 			val logger = mockk<Logger>(relaxed = true)
@@ -113,7 +112,7 @@ class AvroGeneratorErrorTest :
 			val report =
 				AvroGenerator.process(
 					sourceDir = sourceDirectory,
-					extension = extension,
+					config = config,
 					outputDirectory = outputDirectory,
 					reportDir = buildDir,
 					logger = project.logger,
@@ -127,14 +126,14 @@ class AvroGeneratorErrorTest :
 		}
 
 		"should fail on enum without symbols" {
-			val extension =
-				mockk<AvroPluginExtension>(relaxed = true) {
-					every { fieldVisibility } returns "PUBLIC"
-					every { stringType } returns "String"
-					every { optionalGetters } returns false
-					every { createNullSafeAnnotations } returns false
-					every { useDecimalLogical } returns false
-				}
+			val config =
+				AvroGeneratorConfig(
+					fieldVisibility = "PUBLIC",
+					stringType = "String",
+					optionalGetters = false,
+					createNullSafeAnnotations = false,
+					useDecimalLogical = false,
+				)
 
 			val buildDir = createTempDirectory("build").toFile()
 			val logger = mockk<Logger>(relaxed = true)
@@ -171,7 +170,7 @@ class AvroGeneratorErrorTest :
 			shouldThrow<IllegalStateException> {
 				AvroGenerator.process(
 					sourceDir = sourceDirectory,
-					extension = extension,
+					config = config,
 					outputDirectory = outputDirectory,
 					reportDir = buildDir,
 					logger = project.logger,
@@ -184,14 +183,14 @@ class AvroGeneratorErrorTest :
 		}
 
 		"should fail on record without fields" {
-			val extension =
-				mockk<AvroPluginExtension>(relaxed = true) {
-					every { fieldVisibility } returns "PUBLIC"
-					every { stringType } returns "String"
-					every { optionalGetters } returns false
-					every { createNullSafeAnnotations } returns false
-					every { useDecimalLogical } returns false
-				}
+			val config =
+				AvroGeneratorConfig(
+					fieldVisibility = "PUBLIC",
+					stringType = "String",
+					optionalGetters = false,
+					createNullSafeAnnotations = false,
+					useDecimalLogical = false,
+				)
 
 			val buildDir = createTempDirectory("build").toFile()
 			val logger = mockk<Logger>(relaxed = true)
@@ -228,7 +227,7 @@ class AvroGeneratorErrorTest :
 			shouldThrow<IllegalStateException> {
 				AvroGenerator.process(
 					sourceDir = sourceDirectory,
-					extension = extension,
+					config = config,
 					outputDirectory = outputDirectory,
 					reportDir = buildDir,
 					logger = project.logger,

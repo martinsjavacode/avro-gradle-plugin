@@ -1,12 +1,25 @@
 package io.github.martinsjavacode.avro.extension
 
-open class AvroPluginExtension {
-	var sourceDir: String? = null
-	var outputDir: String? = null
-	var fieldVisibility: String = "PUBLIC"
-	var stringType: String = "String"
-	var optionalGetters: Boolean = false
-	var useDecimalLogical: Boolean = false
-	var createNullSafeAnnotations: Boolean = false
-	var validateBeforeGenerate: Boolean = true
+import org.gradle.api.provider.Property
+
+abstract class AvroPluginExtension {
+	abstract val sourceDir: Property<String>
+	abstract val outputDir: Property<String>
+	abstract val fieldVisibility: Property<String>
+	abstract val stringType: Property<String>
+	abstract val optionalGetters: Property<Boolean>
+	abstract val useDecimalLogical: Property<Boolean>
+	abstract val createNullSafeAnnotations: Property<Boolean>
+	abstract val validateBeforeGenerate: Property<Boolean>
+
+	init {
+		sourceDir.convention("src/main/resources/avro")
+		outputDir.convention("generated/java")
+		fieldVisibility.convention("PUBLIC")
+		stringType.convention("String")
+		optionalGetters.convention(false)
+		useDecimalLogical.convention(false)
+		createNullSafeAnnotations.convention(false)
+		validateBeforeGenerate.convention(true)
+	}
 }
