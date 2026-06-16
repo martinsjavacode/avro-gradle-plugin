@@ -20,6 +20,7 @@ dependencies {
 	implementation(gradleApi())
 	implementation("org.apache.avro:avro:${property("avroVersion")}")
 	implementation("org.apache.avro:avro-compiler:${property("avroVersion")}")
+	implementation("org.apache.avro:avro-idl:${property("avroVersion")}")
 
 	testImplementation(gradleTestKit())
 	testImplementation("io.kotest:kotest-runner-junit5:${property("kotestVersion")}")

@@ -50,7 +50,7 @@ class AvroGradlePluginTest : FunSpec({
 						}
 
 						avro {
-						    validateBeforeGenerate = false
+						    validateBeforeGenerate.set(false)
 						}
 						""".trimIndent(),
 					)
@@ -100,9 +100,9 @@ class AvroGradlePluginTest : FunSpec({
 						}
 
 						avro {
-						    sourceDir = "src/main/resources/schemas"
-						    outputDir = "build/generated/avro"
-						    validateBeforeGenerate = false
+						    sourceDir.set("src/main/resources/schemas")
+						    outputDir.set("build/generated/avro")
+						    validateBeforeGenerate.set(false)
 						}
 						""".trimIndent(),
 					)
@@ -144,9 +144,9 @@ class AvroGradlePluginTest : FunSpec({
 						}
 
 						avro {
-						    sourceDir = "src/main/resources/avro"
-						    outputDir = "build/generated/java"
-						    validateBeforeGenerate = false
+						    sourceDir.set("src/main/resources/avro")
+						    outputDir.set("build/generated/java")
+						    validateBeforeGenerate.set(false)
 						}
 						""".trimIndent(),
 					)

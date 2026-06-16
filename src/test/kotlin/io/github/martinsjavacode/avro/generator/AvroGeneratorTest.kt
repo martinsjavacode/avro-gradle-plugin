@@ -1,6 +1,5 @@
 package io.github.martinsjavacode.avro.generator
 
-import io.github.martinsjavacode.avro.extension.AvroPluginExtension
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.*
@@ -14,21 +13,21 @@ import kotlin.io.path.createTempDirectory
 
 class AvroGeneratorTest :
 	FunSpec({
-		lateinit var extension: AvroPluginExtension
+		lateinit var config: AvroGeneratorConfig
 		lateinit var project: Project
 		lateinit var sourceDirectory: File
 		lateinit var outputDirectory: File
 		lateinit var buildDir: File
 
 		beforeTest {
-			extension =
-				mockk(relaxed = true) {
-					every { fieldVisibility } returns "PUBLIC"
-					every { stringType } returns "String"
-					every { optionalGetters } returns false
-					every { createNullSafeAnnotations } returns false
-					every { useDecimalLogical } returns false
-				}
+			config =
+				AvroGeneratorConfig(
+					fieldVisibility = "PUBLIC",
+					stringType = "String",
+					optionalGetters = false,
+					useDecimalLogical = false,
+					createNullSafeAnnotations = false,
+				)
 
 			buildDir = createTempDirectory("build").toFile()
 			val logger = mockk<Logger>(relaxed = true)
@@ -90,9 +89,10 @@ class AvroGeneratorTest :
 			val report =
 				AvroGenerator.process(
 					sourceDir = sourceDirectory,
-					project = project,
-					extension = extension,
+					config = config,
 					outputDirectory = outputDirectory,
+					reportDir = buildDir,
+					logger = project.logger,
 				)
 
 			report.getClassCount() shouldBe 1
@@ -109,9 +109,10 @@ class AvroGeneratorTest :
 			try {
 				AvroGenerator.process(
 					sourceDir = sourceDirectory,
-					project = project,
-					extension = extension,
+					config = config,
 					outputDirectory = outputDirectory,
+					reportDir = buildDir,
+					logger = project.logger,
 				)
 			} catch (e: IllegalStateException) {
 				exceptionThrown = true
@@ -127,11 +128,41 @@ class AvroGeneratorTest :
 			val report =
 				AvroGenerator.process(
 					sourceDir = sourceDirectory,
-					project = project,
-					extension = extension,
+					config = config,
 					outputDirectory = outputDirectory,
+					reportDir = buildDir,
+					logger = project.logger,
 				)
 
 			report.getClassCount() shouldBe 0
+		}
+
+		test("should process AVDL files") {
+			File(sourceDirectory, "sourceSubDirectory/user.avsc").delete()
+			File(sourceDirectory, "sourceSubDirectory").deleteRecursively()
+
+			File(sourceDirectory, "message.avdl").writeText(
+				"""
+				@namespace("com.example")
+				protocol MessageProtocol {
+				  record Message {
+				    string id;
+				    string content;
+				    long timestamp;
+				  }
+				}
+				""".trimIndent(),
+			)
+
+			val report =
+				AvroGenerator.process(
+					sourceDir = sourceDirectory,
+					config = config,
+					outputDirectory = outputDirectory,
+					reportDir = buildDir,
+					logger = project.logger,
+				)
+
+			report.getClassCount() shouldBe 1
 		}
 	})

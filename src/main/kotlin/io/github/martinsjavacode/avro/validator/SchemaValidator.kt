@@ -2,24 +2,26 @@ package io.github.martinsjavacode.avro.validator
 
 import org.apache.avro.Protocol
 import org.apache.avro.Schema
-import org.gradle.api.Project
+import org.apache.avro.idl.IdlReader
+import org.gradle.api.logging.Logger
 import java.io.File
 
-class SchemaValidator(private val project: Project) {
+class SchemaValidator(private val logger: Logger) {
 	fun validate(sourceDir: File): ValidationResult {
 		val errors = mutableListOf<String>()
 		var validatedCount = 0
 
 		sourceDir.walkTopDown()
-			.filter { it.isFile && it.extension in listOf("avsc", "avpr") }
+			.filter { it.isFile && it.extension in listOf("avsc", "avpr", "avdl") }
 			.forEach { file ->
 				try {
 					when (file.extension) {
 						"avsc" -> validateAvsc(file)
 						"avpr" -> validateAvpr(file)
+						"avdl" -> validateAvdl(file)
 					}
 					validatedCount++
-					project.logger.lifecycle("✓ ${file.name}")
+					logger.lifecycle("✓ ${file.name}")
 				} catch (e: Exception) {
 					errors.add("${file.name}: ${e.message}")
 				}
@@ -36,6 +38,13 @@ class SchemaValidator(private val project: Project) {
 	private fun validateAvpr(file: File) {
 		val protocol = Protocol.parse(file)
 		protocol.types.forEach { schema ->
+			validateSchemaStructure(schema, file.name)
+		}
+	}
+
+	private fun validateAvdl(file: File) {
+		val idlFile = IdlReader().parse(file.toPath())
+		idlFile.namedSchemas.values.forEach { schema ->
 			validateSchemaStructure(schema, file.name)
 		}
 	}

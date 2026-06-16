@@ -2,9 +2,7 @@ package io.github.martinsjavacode.avro.validator
 
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
-import io.mockk.every
 import io.mockk.mockk
-import org.gradle.api.Project
 import org.gradle.api.logging.Logger
 import java.io.File
 import kotlin.io.path.createTempDirectory
@@ -12,11 +10,9 @@ import kotlin.io.path.createTempDirectory
 class SchemaValidatorTest :
 	StringSpec({
 		"should validate valid AVSC schema" {
-			val project = mockk<Project>()
 			val logger = mockk<Logger>(relaxed = true)
-			every { project.logger } returns logger
 
-			val validator = SchemaValidator(project)
+			val validator = SchemaValidator(logger)
 			val tempDir = createTempDirectory().toFile()
 
 			File(tempDir, "user.avsc").writeText(
@@ -42,11 +38,9 @@ class SchemaValidatorTest :
 		}
 
 		"should detect invalid schema with no fields" {
-			val project = mockk<Project>()
 			val logger = mockk<Logger>(relaxed = true)
-			every { project.logger } returns logger
 
-			val validator = SchemaValidator(project)
+			val validator = SchemaValidator(logger)
 			val tempDir = createTempDirectory("test").toFile()
 
 			File(tempDir, "empty.avsc").writeText(
@@ -69,11 +63,9 @@ class SchemaValidatorTest :
 		}
 
 		"should validate multiple schema files" {
-			val project = mockk<Project>()
 			val logger = mockk<Logger>(relaxed = true)
-			every { project.logger } returns logger
 
-			val validator = SchemaValidator(project)
+			val validator = SchemaValidator(logger)
 			val tempDir = createTempDirectory("test").toFile()
 
 			File(tempDir, "user.avsc").writeText(
@@ -105,11 +97,9 @@ class SchemaValidatorTest :
 		}
 
 		"should validate AVPR protocol files" {
-			val project = mockk<Project>()
 			val logger = mockk<Logger>(relaxed = true)
-			every { project.logger } returns logger
 
-			val validator = SchemaValidator(project)
+			val validator = SchemaValidator(logger)
 			val tempDir = createTempDirectory("test").toFile()
 
 			File(tempDir, "protocol.avpr").writeText(
@@ -137,11 +127,9 @@ class SchemaValidatorTest :
 		}
 
 		"should validate enum schemas" {
-			val project = mockk<Project>()
 			val logger = mockk<Logger>(relaxed = true)
-			every { project.logger } returns logger
 
-			val validator = SchemaValidator(project)
+			val validator = SchemaValidator(logger)
 			val tempDir = createTempDirectory("test").toFile()
 
 			File(tempDir, "status.avsc").writeText(
@@ -164,11 +152,9 @@ class SchemaValidatorTest :
 		}
 
 		"should detect enum with no symbols" {
-			val project = mockk<Project>()
 			val logger = mockk<Logger>(relaxed = true)
-			every { project.logger } returns logger
 
-			val validator = SchemaValidator(project)
+			val validator = SchemaValidator(logger)
 			val tempDir = createTempDirectory("test").toFile()
 
 			File(tempDir, "empty-enum.avsc").writeText(
@@ -190,11 +176,9 @@ class SchemaValidatorTest :
 		}
 
 		"should validate nested record types" {
-			val project = mockk<Project>()
 			val logger = mockk<Logger>(relaxed = true)
-			every { project.logger } returns logger
 
-			val validator = SchemaValidator(project)
+			val validator = SchemaValidator(logger)
 			val tempDir = createTempDirectory("test").toFile()
 
 			File(tempDir, "nested.avsc").writeText(
@@ -228,11 +212,9 @@ class SchemaValidatorTest :
 		}
 
 		"should validate array types" {
-			val project = mockk<Project>()
 			val logger = mockk<Logger>(relaxed = true)
-			every { project.logger } returns logger
 
-			val validator = SchemaValidator(project)
+			val validator = SchemaValidator(logger)
 			val tempDir = createTempDirectory("test").toFile()
 
 			File(tempDir, "array.avsc").writeText(
@@ -263,11 +245,9 @@ class SchemaValidatorTest :
 		}
 
 		"should validate map types" {
-			val project = mockk<Project>()
 			val logger = mockk<Logger>(relaxed = true)
-			every { project.logger } returns logger
 
-			val validator = SchemaValidator(project)
+			val validator = SchemaValidator(logger)
 			val tempDir = createTempDirectory("test").toFile()
 
 			File(tempDir, "map.avsc").writeText(
@@ -298,11 +278,9 @@ class SchemaValidatorTest :
 		}
 
 		"should validate union types" {
-			val project = mockk<Project>()
 			val logger = mockk<Logger>(relaxed = true)
-			every { project.logger } returns logger
 
-			val validator = SchemaValidator(project)
+			val validator = SchemaValidator(logger)
 			val tempDir = createTempDirectory("test").toFile()
 
 			File(tempDir, "union.avsc").writeText(
@@ -317,6 +295,33 @@ class SchemaValidatorTest :
 				      "type": ["null", "string"]
 				    }
 				  ]
+				}
+				""".trimIndent(),
+			)
+
+			val result = validator.validate(tempDir)
+
+			result.hasErrors() shouldBe false
+			result.validatedCount shouldBe 1
+
+			tempDir.deleteRecursively()
+		}
+
+		"should validate AVDL files" {
+			val logger = mockk<Logger>(relaxed = true)
+
+			val validator = SchemaValidator(logger)
+			val tempDir = createTempDirectory("test").toFile()
+
+			File(tempDir, "message.avdl").writeText(
+				"""
+				@namespace("com.example")
+				protocol MessageProtocol {
+				  record Message {
+				    string id;
+				    string content;
+				    long timestamp;
+				  }
 				}
 				""".trimIndent(),
 			)

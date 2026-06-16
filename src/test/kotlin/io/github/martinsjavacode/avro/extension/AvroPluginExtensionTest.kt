@@ -2,70 +2,69 @@ package io.github.martinsjavacode.avro.extension
 
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
+import org.gradle.testfixtures.ProjectBuilder
 
 class AvroPluginExtensionTest :
 	StringSpec({
 		"should have default values" {
-			val extension = AvroPluginExtension()
+			val project = ProjectBuilder.builder().build()
+			val extension = project.extensions.create("avro", AvroPluginExtension::class.java)
 
-			extension.sourceDir shouldBe null
-			extension.outputDir shouldBe null
-			extension.fieldVisibility shouldBe "PUBLIC"
-			extension.stringType shouldBe "String"
-			extension.optionalGetters shouldBe false
-			extension.useDecimalLogical shouldBe false
-			extension.createNullSafeAnnotations shouldBe false
-			extension.enableCache shouldBe true
-			extension.validateBeforeGenerate shouldBe true
-			extension.generateBuilders shouldBe false
-			extension.addCustomHeader shouldBe null
-			extension.logicalTypeConversions shouldBe emptyMap()
+			extension.sourceDir.get() shouldBe "src/main/resources/avro"
+			extension.outputDir.get() shouldBe "generated/java"
+			extension.fieldVisibility.get() shouldBe "PUBLIC"
+			extension.stringType.get() shouldBe "String"
+			extension.optionalGetters.get() shouldBe false
+			extension.useDecimalLogical.get() shouldBe false
+			extension.createNullSafeAnnotations.get() shouldBe false
+			extension.validateBeforeGenerate.get() shouldBe true
 		}
 
 		"should allow setting custom values" {
-			val extension = AvroPluginExtension()
+			val project = ProjectBuilder.builder().build()
+			val extension = project.extensions.create("avro", AvroPluginExtension::class.java)
 
-			extension.sourceDir = "custom/source"
-			extension.outputDir = "custom/output"
-			extension.fieldVisibility = "PRIVATE"
-			extension.stringType = "CharSequence"
-			extension.optionalGetters = true
-			extension.useDecimalLogical = true
-			extension.createNullSafeAnnotations = true
-			extension.enableCache = false
-			extension.validateBeforeGenerate = false
+			extension.sourceDir.set("custom/source")
+			extension.outputDir.set("custom/output")
+			extension.fieldVisibility.set("PRIVATE")
+			extension.stringType.set("CharSequence")
+			extension.optionalGetters.set(true)
+			extension.useDecimalLogical.set(true)
+			extension.createNullSafeAnnotations.set(true)
+			extension.validateBeforeGenerate.set(false)
 
-			extension.sourceDir shouldBe "custom/source"
-			extension.outputDir shouldBe "custom/output"
-			extension.fieldVisibility shouldBe "PRIVATE"
-			extension.stringType shouldBe "CharSequence"
-			extension.optionalGetters shouldBe true
-			extension.useDecimalLogical shouldBe true
-			extension.createNullSafeAnnotations shouldBe true
-			extension.enableCache shouldBe false
-			extension.validateBeforeGenerate shouldBe false
+			extension.sourceDir.get() shouldBe "custom/source"
+			extension.outputDir.get() shouldBe "custom/output"
+			extension.fieldVisibility.get() shouldBe "PRIVATE"
+			extension.stringType.get() shouldBe "CharSequence"
+			extension.optionalGetters.get() shouldBe true
+			extension.useDecimalLogical.get() shouldBe true
+			extension.createNullSafeAnnotations.get() shouldBe true
+			extension.validateBeforeGenerate.get() shouldBe false
 		}
 
 		"should support all string types" {
-			val extension = AvroPluginExtension()
+			val project = ProjectBuilder.builder().build()
+			val extension = project.extensions.create("avro", AvroPluginExtension::class.java)
 
-			extension.stringType = "String"
-			extension.stringType shouldBe "String"
+			extension.stringType.set("String")
+			extension.stringType.get() shouldBe "String"
 
-			extension.stringType = "CharSequence"
-			extension.stringType shouldBe "CharSequence"
+			extension.stringType.set("CharSequence")
+			extension.stringType.get() shouldBe "CharSequence"
 
-			extension.stringType = "Utf8"
-			extension.stringType shouldBe "Utf8"
+			extension.stringType.set("Utf8")
+			extension.stringType.get() shouldBe "Utf8"
 		}
 
 		"should support all field visibility options" {
-			val extension = AvroPluginExtension()
+			val project = ProjectBuilder.builder().build()
+			val extension = project.extensions.create("avro", AvroPluginExtension::class.java)
 
-			extension.fieldVisibility = "PUBLIC"
-			extension.fieldVisibility shouldBe "PUBLIC"
+			extension.fieldVisibility.set("PUBLIC")
+			extension.fieldVisibility.get() shouldBe "PUBLIC"
 
-			extension.fieldVisibility = "PRIVATE"
-			extension.fieldVisibility shouldBe "PRIVATE"
+			extension.fieldVisibility.set("PRIVATE")
+			extension.fieldVisibility.get() shouldBe "PRIVATE"
 		}
 	})
